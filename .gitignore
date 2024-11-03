@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Gradle files
 .gradle/
 build/
@@ -48,4 +47,3 @@ google-services.json
 .externalNativeBuild
 .cxx
 local.properties
->>>>>>> 45ee38c (initial UI setup (very ugly but simple navigation works))
