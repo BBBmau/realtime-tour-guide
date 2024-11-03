@@ -1,0 +1,25 @@
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+    id 'kotlin-parcelize'
+}
+android {
+    namespace 'com.example.exploreai.shared'
+    compileSdkVersion 34
+    buildFeatures{
+        viewBinding true
+    }
+    defaultConfig {
+        minSdkVersion 28
+        targetSdkVersion 34
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+}
+
+dependencies {
+    implementation 'androidx.media:media:1.6.0'
+}
