@@ -29,6 +29,8 @@
         <activity
             android:name=".ToggleSettingsActivity"
             android:exported="false" />
+
+        <activity android:name=".AssistantActivityActivity"/>
     </application>
 
 </manifest>

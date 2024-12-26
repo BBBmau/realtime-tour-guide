@@ -16,7 +16,7 @@ class UserInfoActivity : AppCompatActivity() {
         binding.continueButton.setOnClickListener {
             // Optional: Validate inputs before proceeding
             if (validateInputs()) {
-                startActivity(Intent(this, ToggleSettingsActivity::class.java))
+                startActivity(Intent(this, AssistantActivityActivity::class.java))
                 finish() // Optional: prevents going back
             }
         }
