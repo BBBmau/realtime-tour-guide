@@ -30,7 +30,7 @@
             android:name=".ToggleSettingsActivity"
             android:exported="false" />
 
-        <activity android:name=".AssistantActivityActivity"/>
+        <activity android:name=".assistant.AssistantActivityActivity"/>
     </application>
 
 </manifest>

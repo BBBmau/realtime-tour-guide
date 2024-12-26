@@ -3,6 +3,7 @@ package com.example.exploreai
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.example.exploreai.assistant.AssistantActivityActivity
 import com.example.exploreai.databinding.ActivityUserInfoBinding
 
 class UserInfoActivity : AppCompatActivity() {

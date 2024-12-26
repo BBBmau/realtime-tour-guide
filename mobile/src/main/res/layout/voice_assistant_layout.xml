@@ -13,6 +13,13 @@
         android:gravity="center"
         android:orientation="vertical">
 
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/messageList"
+            android:layout_width="378dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:padding="8dp" />
+
         <ImageView
             android:id="@+id/microphoneIcon"
             android:layout_width="48dp"
