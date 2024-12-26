@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">explore.ai</string>
+    <string name="assistant_ready">Car Assistant Ready!</string>
 </resources>

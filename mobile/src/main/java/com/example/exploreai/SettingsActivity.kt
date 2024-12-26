@@ -2,14 +2,14 @@ package com.example.exploreai
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.example.exploreai.databinding.ActivityTogglesBinding
+import com.example.exploreai.databinding.ActivitySettingsBinding
 
 class ToggleSettingsActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityTogglesBinding
+    private lateinit var binding: ActivitySettingsBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityTogglesBinding.inflate(layoutInflater)
+        binding = ActivitySettingsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         setupToggleListeners()

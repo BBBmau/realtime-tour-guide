@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.exploreai.shared" >
 
-    <uses-sdk android:minSdkVersion="28" />
+    <uses-sdk android:minSdkVersion="29" />
 
     <application android:appCategory="audio" >
         <meta-data
@@ -14,13 +14,8 @@
          consumers through MediaBrowserService and MediaSession. Consumers connect to it through
          MediaBrowser (for browsing) and MediaController (for playback control)
         -->
-        <service
-            android:name="com.example.exploreai.shared.MyMusicService"
-            android:exported="true" >
-            <intent-filter>
-                <action android:name="android.media.browse.MediaBrowserService" />
-            </intent-filter>
-        </service>
+        <!-- Car App Service -->
+
     </application>
 
 </manifest>
