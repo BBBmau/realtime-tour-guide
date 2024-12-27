@@ -73,19 +73,6 @@ class AssistantActivityActivity : AppCompatActivity() {
         }
     }
 
-    // Call this method when you want to show that the assistant is speaking
-    fun startSpeaking() {
-        isSpeaking = true
-        updateUI()
-    }
-
-    // Call this method when the assistant stops speaking
-    fun stopSpeaking() {
-        isSpeaking = false
-        updateUI()
-    }
-
-
     private lateinit var binding: ActivityAssistantBinding
 
 
