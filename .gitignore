@@ -47,3 +47,4 @@ google-services.json
 .externalNativeBuild
 .cxx
 local.properties
+shared/build/

@@ -21,6 +21,15 @@ android {
 }
 
 dependencies {
+
+    // Retrofit
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+
+    // Optional - Coroutines support
+    implementation ('org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1')
+    implementation ('org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1')
+
     implementation "androidx.car.app:app:1.4.0-rc01"
     implementation "androidx.car.app:app-automotive:1.4.0-rc01"
     implementation "org.jetbrains.kotlin:kotlin-stdlib:1.9.0"

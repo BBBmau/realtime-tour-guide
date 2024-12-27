@@ -86,7 +86,7 @@ class AssistantActivityActivity : AppCompatActivity() {
             statusText.text = "Speaking..."
             microphoneIcon.setColorFilter(getColor(R.color.primary))
             statusText.setTextColor(getColor(R.color.primary))
-
+            //TODO: have ui update in real-time while user is speaking
             speechRecognitionManager.startListening { result -> addNewMessage(result, true) }
         } else {
             microphoneIcon.clearAnimation()
