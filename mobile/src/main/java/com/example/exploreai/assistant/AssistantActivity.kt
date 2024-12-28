@@ -16,6 +16,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.exploreai.R
+import com.example.exploreai.Repository
 import com.example.exploreai.ToggleSettingsActivity
 import com.example.exploreai.databinding.ActivityAssistantBinding
 

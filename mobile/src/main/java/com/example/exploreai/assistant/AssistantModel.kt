@@ -9,7 +9,7 @@ interface ExploreAiAssistantService {
     @GET("sessions")
     suspend fun getData(): Response<ExploreAiEphemeralResp>
 
-    @POST("sessions")
+    @POST("?model={model}")
     suspend fun postData(@Body data: AssistantRequest): Response<AssistantResponse>
 }
 
@@ -21,7 +21,7 @@ data class ExploreAiEphemeralResp(
 )
 
 data class AssistantRequest(
-    val requestField: String
+    val model: String
     // ... other fields
 )
 
