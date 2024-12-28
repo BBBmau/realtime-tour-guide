@@ -6,11 +6,11 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 // Singleton for Retrofit instance
 object AssistantClient {
-    private const val BASE_URL = "https://api.openai.com/v1/realtime"
+    private const val EXPLORE_URL = "https://explore-ai-445408.wl.r.appspot.com/"
 
     private val retrofit: Retrofit by lazy {
         Retrofit.Builder()
-            .baseUrl(BASE_URL)
+            .baseUrl(EXPLORE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }

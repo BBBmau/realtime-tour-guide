@@ -10,20 +10,14 @@ import kotlinx.coroutines.launch
 class AssistantViewModel : ViewModel() {
     private val repository = Repository()
     private val _data = MutableLiveData<ExploreAiEphemeralResp>()
-    val data: LiveData<ExploreAiEphemeralResp> = _data
+    val resp: LiveData<ExploreAiEphemeralResp> = _data
 
     private val _error = MutableLiveData<String>()
     val error: LiveData<String> = _error
 
-    fun fetchData() {
+    fun fetch() {
         viewModelScope.launch {
-            repository.fetchData()
-                .onSuccess { result ->
-                    _data.value = result
-                }
-                .onFailure { exception ->
-                    _error.value = exception.message
-                }
+            _data.value = repository.fetch()
         }
     }
 

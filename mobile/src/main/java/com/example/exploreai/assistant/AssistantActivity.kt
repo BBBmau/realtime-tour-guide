@@ -15,10 +15,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.exploreai.AssistantClient
 import com.example.exploreai.R
-import com.example.exploreai.Repository
 import com.example.exploreai.ToggleSettingsActivity
 import com.example.exploreai.databinding.ActivityAssistantBinding
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.time.delay
 
 class AssistantActivityActivity : AppCompatActivity() {
 
@@ -42,6 +44,16 @@ class AssistantActivityActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // fetches the ephemeral key
+        val assistant = AssistantViewModel()
+
+        //TODO: this is meant for debugging the ephemeral key, should be removed later on.
+        assistant.resp.observe(this) { response ->
+            Log.d("[EPHEMERAL KEY]", response.clientSecret.value)
+        }
+        assistant.fetch()
+
 
         checkPermissionAndSetup()
 

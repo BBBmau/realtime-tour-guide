@@ -1,4 +1,5 @@
 package com.example.exploreai.assistant
+import com.google.gson.annotations.SerializedName
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Body
@@ -6,8 +7,8 @@ import retrofit2.Response
 interface ExploreAiAssistantService {
 
     // requests OpenAi Ephemeral Key from GCP Server after it receives it from OpenAI directly
-    @GET("sessions")
-    suspend fun getData(): Response<ExploreAiEphemeralResp>
+    @GET("session")
+    suspend fun getResponse(): ExploreAiEphemeralResp
 
     @POST("?model={model}")
     suspend fun postData(@Body data: AssistantRequest): Response<AssistantResponse>
@@ -15,9 +16,11 @@ interface ExploreAiAssistantService {
 
 // Data classes for your API responses
 data class ExploreAiEphemeralResp(
-    val field1: String,
-    val field2: Int,
-    // ... other fields
+    @SerializedName("client_secret") val clientSecret: ClientSecret
+)
+
+data class ClientSecret(
+    @SerializedName("value") val value: String
 )
 
 data class AssistantRequest(

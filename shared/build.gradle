@@ -22,9 +22,13 @@ android {
 
 dependencies {
 
-    // Retrofit
+    // Retrofit - HTTP Client setup
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+
+    // KTor - HTTP Client setup for WebSocket Connection
+    implementation "io.ktor:ktor-client-android:1.6.4"
+    implementation "io.ktor:ktor-client-websockets:1.6.4"
 
     // Optional - Coroutines support
     implementation ('org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1')
