@@ -76,7 +76,7 @@ class AssistantActivityActivity : AppCompatActivity() {
         }
         // fetches the ephemeral key
         val assistant = AssistantViewModel()
-
+        assistant.fetch() // TODO: only works on physical device and not emulator
         //TODO: this is meant for debugging the ephemeral key, should be removed later on.
         assistant.resp.observe(this) { response ->
             EPHEMERAL_KEY = response.clientSecret.value
@@ -84,8 +84,6 @@ class AssistantActivityActivity : AppCompatActivity() {
         //TODO: we need to add the body that initializes the rtc session over voice
 //        assistant.startSession(SessionBody("sdpText"))
         }
-        assistant.fetch()
-
 
         checkPermissionAndSetup()
 
