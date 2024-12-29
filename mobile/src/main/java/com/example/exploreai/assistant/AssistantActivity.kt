@@ -22,6 +22,11 @@ import com.example.exploreai.ToggleSettingsActivity
 import com.example.exploreai.databinding.ActivityAssistantBinding
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.time.delay
+import org.webrtc.DataChannel
+import org.webrtc.IceCandidate
+import org.webrtc.MediaStream
+import org.webrtc.PeerConnection
+import org.webrtc.PeerConnectionFactory
 
 lateinit var EPHEMERAL_KEY: String
 
@@ -47,6 +52,21 @@ class AssistantActivityActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+
+        // TODO: AssistantActivity is getting very bloated.
+        //  we need to break this up into smaller pieces
+        // Initialize PeerConnectionFactory globals.
+        val initializationOptions = PeerConnectionFactory.InitializationOptions.builder(this)
+            .createInitializationOptions()
+        PeerConnectionFactory.initialize(initializationOptions)
+
+        // Create a new PeerConnectionFactory instance.
+        val options = PeerConnectionFactory.Options()
+        val peerConnectionFactory = PeerConnectionFactory.builder()
+            .setOptions(options)
+            .createPeerConnectionFactory()
+        createPeerConnection(peerConnectionFactory)
 
         // fetches the ephemeral key
         val assistant = AssistantViewModel()
@@ -139,4 +159,57 @@ class AssistantActivityActivity : AppCompatActivity() {
             }
         }
     }
+}
+
+fun createPeerConnection(peerConnectionFactory: PeerConnectionFactory){
+    // Configuration for the peer connection.
+    val iceServers = mutableListOf(
+        PeerConnection.IceServer.builder("stun:stun.l.google.com:19302").createIceServer()
+    )
+
+    val rtcConfig = PeerConnection.RTCConfiguration(iceServers)
+
+// Create the peer connection instance.
+    val peerConnection = peerConnectionFactory.createPeerConnection(rtcConfig, object : PeerConnection.Observer {
+        override fun onSignalingChange(signalingState: PeerConnection.SignalingState) {
+            // Handle signaling state changes
+        }
+
+        override fun onIceConnectionChange(iceConnectionState: PeerConnection.IceConnectionState) {
+            // Handle ICE connection state changes
+        }
+
+        override fun onIceConnectionReceivingChange(receiving: Boolean) {
+            // Handle ICE connection receiving state changes
+        }
+
+        override fun onIceGatheringChange(iceGatheringState: PeerConnection.IceGatheringState) {
+            // Handle ICE gathering state changes
+        }
+
+        override fun onIceCandidate(iceCandidate: IceCandidate) {
+            // Handle new ICE candidates
+        }
+
+        override fun onIceCandidatesRemoved(iceCandidates: Array<IceCandidate>) {
+            // Handle removed ICE candidates
+        }
+
+        override fun onAddStream(mediaStream: MediaStream) {
+            // Handle added media stream
+        }
+
+        override fun onRemoveStream(mediaStream: MediaStream) {
+            // Handle removed media stream
+        }
+
+        override fun onDataChannel(dataChannel: DataChannel) {
+            // Handle data channel events
+        }
+
+        override fun onRenegotiationNeeded() {
+            // Handle renegotiation needed events
+        }
+    })
+
 }
