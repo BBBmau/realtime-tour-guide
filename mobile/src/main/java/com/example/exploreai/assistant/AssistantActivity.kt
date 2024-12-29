@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.se.omapi.Session
 import android.util.Log
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
@@ -55,7 +56,7 @@ class AssistantActivityActivity : AppCompatActivity() {
             EPHEMERAL_KEY = response.clientSecret.value
             Log.d("[EPHEMERAL KEY]", response.clientSecret.value)
         //TODO: we need to add the body that initializes the rtc session over voice
-        //assistant.postData()
+//        assistant.startSession(SessionBody("sdpText"))
         }
         assistant.fetch()
 

@@ -21,9 +21,9 @@ class AssistantViewModel : ViewModel() {
         }
     }
 
-    fun postData(request: AssistantRequest) {
+    fun startSession(request: SessionBody) {
         viewModelScope.launch {
-            repository.postData(request)
+            repository.startSession(request)
                 .onSuccess { result ->
                     // Handle success
                 }

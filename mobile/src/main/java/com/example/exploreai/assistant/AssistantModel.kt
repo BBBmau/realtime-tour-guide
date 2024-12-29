@@ -11,7 +11,10 @@ interface ExploreAiAssistantService {
     suspend fun getResponse(): ExploreAiEphemeralResp
 
     @POST("?model=gpt-4o-realtime-preview-2024-12-17")
-    suspend fun postData(@Body data: AssistantRequest): Response<AssistantResponse>
+    suspend fun startSession(@Body data: SessionBody): Response<SessionResponse>
+
+    @POST("sessions")
+    suspend fun sendUserResponse(@Body data: AssistantRequest): Response<AssistantResponse>
 }
 
 // Data classes for your API responses
@@ -23,9 +26,24 @@ data class ClientSecret(
     @SerializedName("value") val value: String
 )
 
-data class AssistantRequest(
-    val model: String
+data class SessionBody(
+    val sdp : String //TODO: we need to find how to initialize a session for this value.
+)
+
+data class SessionResponse(
+    val sdpText: String
     // ... other fields
+)
+
+data class AssistantRequest(
+    val type: String,
+    val response: UserRequest
+    // ... other fields
+)
+
+data class UserRequest(
+    val modalities: Array<String>,
+    val instructions: String
 )
 
 data class AssistantResponse(

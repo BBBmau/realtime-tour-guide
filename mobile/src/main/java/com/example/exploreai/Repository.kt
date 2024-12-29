@@ -4,6 +4,8 @@ import android.util.Log
 import com.example.exploreai.assistant.AssistantRequest
 import com.example.exploreai.assistant.AssistantResponse
 import com.example.exploreai.assistant.ExploreAiEphemeralResp
+import com.example.exploreai.assistant.SessionBody
+import com.example.exploreai.assistant.SessionResponse
 
 // Repository class to handle data operations
 class Repository {
@@ -20,9 +22,9 @@ class Repository {
     }
 
     // used for when user interacts with the assistant with the resp being from the assistant
-    suspend fun postData(request: AssistantRequest): Result<AssistantResponse> {
+    suspend fun startSession(request: SessionBody): Result<SessionResponse> {
         return try {
-            val response = AssistantClient.openAiService.postData(request)
+            val response = AssistantClient.openAiService.startSession(request)
             if (response.isSuccessful) {
                 Result.success(response.body()!!)
             } else {
