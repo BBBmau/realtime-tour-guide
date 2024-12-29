@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.se.omapi.Session
 import android.util.Log
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
@@ -16,17 +15,18 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.exploreai.AssistantClient
 import com.example.exploreai.R
 import com.example.exploreai.ToggleSettingsActivity
 import com.example.exploreai.databinding.ActivityAssistantBinding
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.time.delay
+import org.webrtc.AudioSource
+import org.webrtc.AudioTrack
 import org.webrtc.DataChannel
 import org.webrtc.IceCandidate
+import org.webrtc.MediaConstraints
 import org.webrtc.MediaStream
 import org.webrtc.PeerConnection
 import org.webrtc.PeerConnectionFactory
+
 
 lateinit var EPHEMERAL_KEY: String
 
@@ -66,8 +66,14 @@ class AssistantActivityActivity : AppCompatActivity() {
         val peerConnectionFactory = PeerConnectionFactory.builder()
             .setOptions(options)
             .createPeerConnectionFactory()
-        createPeerConnection(peerConnectionFactory)
+        val pc = createPeerConnection(peerConnectionFactory)
+        // Create an AudioSource instance.
+        val audioSource: AudioSource = peerConnectionFactory.createAudioSource(MediaConstraints())
+        val localAudioTrack: AudioTrack = peerConnectionFactory.createAudioTrack("101", audioSource)
 
+        if (pc != null) {
+            pc.addTrack(localAudioTrack)
+        }
         // fetches the ephemeral key
         val assistant = AssistantViewModel()
 
@@ -161,7 +167,7 @@ class AssistantActivityActivity : AppCompatActivity() {
     }
 }
 
-fun createPeerConnection(peerConnectionFactory: PeerConnectionFactory){
+fun createPeerConnection(peerConnectionFactory: PeerConnectionFactory) : PeerConnection? {
     // Configuration for the peer connection.
     val iceServers = mutableListOf(
         PeerConnection.IceServer.builder("stun:stun.l.google.com:19302").createIceServer()
@@ -212,4 +218,10 @@ fun createPeerConnection(peerConnectionFactory: PeerConnectionFactory){
         }
     })
 
+    if (peerConnection == null){
+        Log.e("[PEER CONNECTION ERROR]", "Could not create Peer Connection")
+        return null
+    }
+
+    return peerConnection
 }
