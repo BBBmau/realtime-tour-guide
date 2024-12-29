@@ -22,7 +22,7 @@ class Repository {
     // used for when user interacts with the assistant with the resp being from the assistant
     suspend fun postData(request: AssistantRequest): Result<AssistantResponse> {
         return try {
-            val response = AssistantClient.apiService.postData(request)
+            val response = AssistantClient.openAiService.postData(request)
             if (response.isSuccessful) {
                 Result.success(response.body()!!)
             } else {

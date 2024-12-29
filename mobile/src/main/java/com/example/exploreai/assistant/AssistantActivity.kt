@@ -22,6 +22,8 @@ import com.example.exploreai.databinding.ActivityAssistantBinding
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.time.delay
 
+lateinit var EPHEMERAL_KEY: String
+
 class AssistantActivityActivity : AppCompatActivity() {
 
     private lateinit var speechRecognitionManager: SpeechRecognitionManager
@@ -50,7 +52,10 @@ class AssistantActivityActivity : AppCompatActivity() {
 
         //TODO: this is meant for debugging the ephemeral key, should be removed later on.
         assistant.resp.observe(this) { response ->
+            EPHEMERAL_KEY = response.clientSecret.value
             Log.d("[EPHEMERAL KEY]", response.clientSecret.value)
+        //TODO: we need to add the body that initializes the rtc session over voice
+        //assistant.postData()
         }
         assistant.fetch()
 
