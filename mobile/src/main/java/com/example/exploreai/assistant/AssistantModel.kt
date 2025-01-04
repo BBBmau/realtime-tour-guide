@@ -10,7 +10,7 @@ interface ExploreAiAssistantService {
     @GET("session")
     suspend fun getResponse(): ExploreAiEphemeralResp
 
-    @POST("?model=gpt-4o-realtime-preview-2024-12-17")
+    @POST("/realtime?model=gpt-4o-realtime-preview-2024-12-17")
     suspend fun startSession(@Body data: SessionBody): Response<SessionResponse>
 
     @POST("sessions")

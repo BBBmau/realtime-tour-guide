@@ -1,5 +1,6 @@
 package com.example.exploreai
 
+import android.companion.AssociatedDevice
 import android.util.Log
 import com.example.exploreai.assistant.AssistantRequest
 import com.example.exploreai.assistant.AssistantResponse
@@ -26,9 +27,10 @@ class Repository {
         return try {
             val response = AssistantClient.openAiService.startSession(request)
             if (response.isSuccessful) {
+                Log.d("[startSession]", "sessionResp received: ${response.body()}")
                 Result.success(response.body()!!)
             } else {
-                Result.failure(Exception("API call failed with code: ${response.code()}"))
+                Result.failure(Exception("API call failed with code: ${response.code()};\nsdp used: ${request.sdp}"))
             }
         } catch (e: Exception) {
             Result.failure(e)

@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.se.omapi.Session
 import android.util.Log
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
@@ -26,6 +27,8 @@ import org.webrtc.MediaConstraints
 import org.webrtc.MediaStream
 import org.webrtc.PeerConnection
 import org.webrtc.PeerConnectionFactory
+import org.webrtc.SdpObserver
+import org.webrtc.SessionDescription
 
 
 lateinit var EPHEMERAL_KEY: String
@@ -71,9 +74,7 @@ class AssistantActivityActivity : AppCompatActivity() {
         val audioSource: AudioSource = peerConnectionFactory.createAudioSource(MediaConstraints())
         val localAudioTrack: AudioTrack = peerConnectionFactory.createAudioTrack("101", audioSource)
 
-        if (pc != null) {
-            pc.addTrack(localAudioTrack)
-        }
+        pc?.addTrack(localAudioTrack)
         // fetches the ephemeral key
         val assistant = AssistantViewModel()
         assistant.fetch() // TODO: only works on physical device and not emulator
@@ -82,7 +83,27 @@ class AssistantActivityActivity : AppCompatActivity() {
             EPHEMERAL_KEY = response.clientSecret.value
             Log.d("[EPHEMERAL KEY]", response.clientSecret.value)
         //TODO: we need to add the body that initializes the rtc session over voice
-//        assistant.startSession(SessionBody("sdpText"))
+            pc?.createDataChannel("oai-events", DataChannel.Init())
+
+            val sdp = createOffer(pc!!).toString() // sets the localDescription internally
+            Log.d("[startSession]", "session created with sdp $sdp")
+            assistant.startSession(SessionBody(sdp))
+
+            assistant.sessionResp.observe(this) { resp ->
+                when (resp) {
+                    is ApiResult.Success -> {
+                        // Handle success
+                        val data = resp.data
+                        Log.d("[startSession]", "SUCCESS: sdpResp $data")
+                    }
+                    is ApiResult.Error -> {
+                        // Handle error
+                        Toast.makeText(this, resp.message, Toast.LENGTH_SHORT).show()
+                        Log.e("[API ERROR]", resp.message)
+                    }
+                    else -> { Toast.makeText(this, "unknown sessionResp error", Toast.LENGTH_SHORT).show()}
+                }
+            }
         }
 
         checkPermissionAndSetup()
@@ -222,4 +243,32 @@ fun createPeerConnection(peerConnectionFactory: PeerConnectionFactory) : PeerCon
     }
 
     return peerConnection
+}
+
+//TODO: move this to its own file
+private fun createOffer(peerConnection: PeerConnection): SdpObserver {
+    val observer = object : SdpObserver {
+        override fun onCreateSuccess(sessionDescription: SessionDescription) {
+            Log.d("RTC", "Local SDP created")
+            peerConnection.setLocalDescription(this, sessionDescription)
+        }
+
+        override fun onSetSuccess() {
+            Log.d("RTC", "Local SDP set")
+            // Local description was set, now ready for ICE candidates
+        }
+
+        override fun onCreateFailure(error: String) {
+            Log.e("RTC", "Failed to create local SDP: $error")
+        }
+
+        override fun onSetFailure(error: String) {
+            Log.e("RTC", "Failed to set local SDP: $error")
+        }
+    }
+
+    // Create the offer
+    peerConnection.createOffer(observer, MediaConstraints())
+
+    return observer
 }
