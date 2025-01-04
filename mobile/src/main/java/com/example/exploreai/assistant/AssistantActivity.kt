@@ -16,9 +16,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.exploreai.AssistantClient
 import com.example.exploreai.R
 import com.example.exploreai.ToggleSettingsActivity
 import com.example.exploreai.databinding.ActivityAssistantBinding
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.ResponseBody
 import org.webrtc.AudioSource
 import org.webrtc.AudioTrack
 import org.webrtc.DataChannel
@@ -29,9 +33,13 @@ import org.webrtc.PeerConnection
 import org.webrtc.PeerConnectionFactory
 import org.webrtc.SdpObserver
 import org.webrtc.SessionDescription
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 
 lateinit var EPHEMERAL_KEY: String
+val assistant = AssistantViewModel()
 
 class AssistantActivityActivity : AppCompatActivity() {
 
@@ -76,7 +84,6 @@ class AssistantActivityActivity : AppCompatActivity() {
 
         pc?.addTrack(localAudioTrack)
         // fetches the ephemeral key
-        val assistant = AssistantViewModel()
         assistant.fetch() // TODO: only works on physical device and not emulator
         //TODO: this is meant for debugging the ephemeral key, should be removed later on.
         assistant.resp.observe(this) { response ->
@@ -85,9 +92,7 @@ class AssistantActivityActivity : AppCompatActivity() {
         //TODO: we need to add the body that initializes the rtc session over voice
             pc?.createDataChannel("oai-events", DataChannel.Init())
 
-            val sdp = createOffer(pc!!).toString() // sets the localDescription internally
-            Log.d("[startSession]", "session created with sdp $sdp")
-            assistant.startSession(sdp)
+            createOffer(pc!!) // sets the localDescription internally
 
             assistant.sessionResp.observe(this) { resp ->
                 when (resp) {
@@ -246,29 +251,38 @@ fun createPeerConnection(peerConnectionFactory: PeerConnectionFactory) : PeerCon
 }
 
 //TODO: move this to its own file
-private fun createOffer(peerConnection: PeerConnection): SdpObserver {
+private fun createOffer(peerConnection: PeerConnection) {
     val observer = object : SdpObserver {
         override fun onCreateSuccess(sessionDescription: SessionDescription) {
-            Log.d("RTC", "Local SDP created")
-            peerConnection.setLocalDescription(this, sessionDescription)
+            var sdp = sessionDescription.description
+
+            // Sanitize SDP for WHIP compliance
+            sdp = sdp.replace("a=sendrecv", "a=sendonly")
+            if (!sdp.contains("a=group:BUNDLE")) {
+                val bundleGroup = "a=group:BUNDLE 0\r\n"
+                sdp = sdp.replaceFirst("m=", "$bundleGroup m=")
+            }
+            sdp = sdp.replace("m=audio", "m=audio 9 UDP/TLS/RTP/SAVPF 111\r\na=bundle-only")
+            if (!sdp.contains("a=rtcp-mux-only")) {
+                sdp = sdp.replace("a=rtcp-mux", "a=rtcp-mux\r\na=rtcp-mux-only")
+            }
+            sdp = sdp.replace("a=setup:active", "a=setup:actpass")
+
+            val sanitizedSessionDescription = SessionDescription(sessionDescription.type, sdp)
+            peerConnection.setLocalDescription(this, sanitizedSessionDescription)
+            Log.d("[startSession]", "session created with sdp ${sanitizedSessionDescription.description}")
+            assistant.startSession(sanitizedSessionDescription.description)
         }
 
-        override fun onSetSuccess() {
-            Log.d("RTC", "Local SDP set")
-            // Local description was set, now ready for ICE candidates
-        }
-
-        override fun onCreateFailure(error: String) {
-            Log.e("RTC", "Failed to create local SDP: $error")
-        }
-
-        override fun onSetFailure(error: String) {
-            Log.e("RTC", "Failed to set local SDP: $error")
-        }
+        override fun onSetSuccess() {}
+        override fun onCreateFailure(error: String) {}
+        override fun onSetFailure(error: String) {}
     }
 
-    // Create the offer
-    peerConnection.createOffer(observer, MediaConstraints())
+    val mediaConstraints = MediaConstraints().apply {
+        mandatory.add(MediaConstraints.KeyValuePair("OfferToReceiveAudio", "false"))
+        mandatory.add(MediaConstraints.KeyValuePair("OfferToReceiveVideo", "false"))
+    }
 
-    return observer
+    peerConnection.createOffer(observer, mediaConstraints)
 }

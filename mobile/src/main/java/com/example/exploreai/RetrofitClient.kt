@@ -46,7 +46,9 @@ class SDPConverterFactory : Converter.Factory() {
 
 class SDPBodyConverter : Converter<String, RequestBody> {
     override fun convert(sdp: String): RequestBody {
-        return sdp.toRequestBody("application/sdp".toMediaType())
+        // Use the raw bytes of the SDP string to avoid charset being added
+        val mediaType = "application/sdp".toMediaType()
+        return RequestBody.create(mediaType, sdp.toByteArray(Charsets.UTF_8))
     }
 }
 
@@ -65,8 +67,8 @@ private fun okHttpClient(ephemeralKey: String) = OkHttpClient().newBuilder()
             override fun intercept(chain: Interceptor.Chain): Response {
                 val request: Request = chain.request()
                     .newBuilder()
-                    .header("Content-Type", "application/sdp")
-                    .header("Authorization", ephemeralKey)
+                    .header("Content-Type", "application/sdp".toMediaType().toString())
+                    .header("Authorization", "Bearer $ephemeralKey")
                     .build()
                 return chain.proceed(request)
             }
