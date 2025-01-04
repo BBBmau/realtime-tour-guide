@@ -32,7 +32,6 @@ data class ClientSecret(
 )
 
 data class SessionBody(
-    val type: String,
     val sdp: String
 )
 

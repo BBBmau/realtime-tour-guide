@@ -20,6 +20,8 @@ import com.example.exploreai.AssistantClient
 import com.example.exploreai.R
 import com.example.exploreai.ToggleSettingsActivity
 import com.example.exploreai.databinding.ActivityAssistantBinding
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.coroutineScope
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.ResponseBody
@@ -36,6 +38,9 @@ import org.webrtc.SessionDescription
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 
 lateinit var EPHEMERAL_KEY: String
@@ -91,15 +96,13 @@ class AssistantActivityActivity : AppCompatActivity() {
             Log.d("[EPHEMERAL KEY]", response.clientSecret.value)
         //TODO: we need to add the body that initializes the rtc session over voice
             pc?.createDataChannel("oai-events", DataChannel.Init())
-
-            createOffer(pc!!) // sets the localDescription internally
-
+            assistant.createSession(pc!!)
             assistant.sessionResp.observe(this) { resp ->
                 when (resp) {
                     is ApiResult.Success -> {
                         // Handle success
-                        val data = resp.data
-                        Log.d("[startSession]", "SUCCESS: sdpResp $data")
+//                        createRemoteDescription(pc, resp.data.sdp)
+                        Log.d("[startSession]", "SUCCESS: sdpResp ${resp.data.sdp}")
                     }
                     is ApiResult.Error -> {
                         // Handle error
@@ -250,39 +253,107 @@ fun createPeerConnection(peerConnectionFactory: PeerConnectionFactory) : PeerCon
     return peerConnection
 }
 
+lateinit var sanitizedSDP : SessionDescription
 //TODO: move this to its own file
-private fun createOffer(peerConnection: PeerConnection) {
-    val observer = object : SdpObserver {
-        override fun onCreateSuccess(sessionDescription: SessionDescription) {
-            var sdp = sessionDescription.description
+suspend fun createOffer(peerConnection: PeerConnection) = coroutineScope {
+    suspendCoroutine<String> { continuation ->
+        val offerObserver = object : SdpObserver {
+            override fun onCreateSuccess(sessionDescription: SessionDescription) {
+                try {
+                    var sdp = sessionDescription.description
 
-            // Sanitize SDP for WHIP compliance
-            sdp = sdp.replace("a=sendrecv", "a=sendonly")
-            if (!sdp.contains("a=group:BUNDLE")) {
-                val bundleGroup = "a=group:BUNDLE 0\r\n"
-                sdp = sdp.replaceFirst("m=", "$bundleGroup m=")
-            }
-            sdp = sdp.replace("m=audio", "m=audio 9 UDP/TLS/RTP/SAVPF 111\r\na=bundle-only")
-            if (!sdp.contains("a=rtcp-mux-only")) {
-                sdp = sdp.replace("a=rtcp-mux", "a=rtcp-mux\r\na=rtcp-mux-only")
-            }
-            sdp = sdp.replace("a=setup:active", "a=setup:actpass")
+                    // Sanitize SDP
+                    sdp = sdp.replace("a=sendrecv", "a=sendonly")
+                        .replace("a=setup:active", "a=setup:actpass")
 
-            val sanitizedSessionDescription = SessionDescription(sessionDescription.type, sdp)
-            peerConnection.setLocalDescription(this, sanitizedSessionDescription)
-            Log.d("[startSession]", "session created with sdp ${sanitizedSessionDescription.description}")
-            assistant.startSession(sanitizedSessionDescription.description)
+                    sanitizedSDP = SessionDescription(
+                        SessionDescription.Type.OFFER,
+                        sdp
+                    )
+
+                    Log.d("[createOffer]", "Setting local description with SDP: ${sanitizedSDP.description}")
+
+                    // Wait for setLocalDescription to complete
+                    setLocalDescriptionAsync(peerConnection, sanitizedSDP).invokeOnCompletion { throwable ->
+                        if (throwable != null) {
+                            continuation.resumeWithException(throwable)
+                        } else {
+                            // Only continue when local description is set
+                            peerConnection.localDescription?.let { desc ->
+                                continuation.resume(desc.description)
+                            } ?: continuation.resumeWithException(Exception("Local description is null"))
+                        }
+                    }
+                } catch (e: Exception) {
+                    continuation.resumeWithException(e)
+                }
+            }
+
+            override fun onCreateFailure(error: String) {
+                continuation.resumeWithException(Exception("Failed to create offer: $error"))
+            }
+
+            override fun onSetSuccess() {
+                Log.d("[createOffer]", "SUCCESS: set local description")
+            }
+            override fun onSetFailure(error: String) {
+                Log.d("[createOffer]", error)
+            }
         }
 
-        override fun onSetSuccess() {}
-        override fun onCreateFailure(error: String) {}
-        override fun onSetFailure(error: String) {}
+        val constraints = MediaConstraints().apply {
+            mandatory.add(MediaConstraints.KeyValuePair("OfferToReceiveAudio", "false"))
+            mandatory.add(MediaConstraints.KeyValuePair("OfferToReceiveVideo", "false"))
+        }
+
+        try {
+            peerConnection.createOffer(offerObserver, constraints)
+            Log.d("[createOffer]","signaling state now: ${peerConnection.signalingState()}")
+        } catch (e: Exception) {
+            continuation.resumeWithException(e)
+        }
+    }
+}
+
+private fun setLocalDescriptionAsync(
+    peerConnection: PeerConnection,
+    description: SessionDescription
+) = CompletableDeferred<Unit>().apply {
+    peerConnection.setLocalDescription(object : SdpObserver {
+        override fun onSetSuccess() {
+            Log.d("[setLocalDescription]", "Set local description success")
+            complete(Unit)
+        }
+
+        override fun onSetFailure(error: String) {
+            Log.e("[setLocalDescription]", "Set local description failed: $error")
+            completeExceptionally(Exception("Failed to set local description: $error"))
+        }
+
+        override fun onCreateSuccess(p0: SessionDescription?) {}
+        override fun onCreateFailure(p0: String?) {}
+    }, description)
+}
+
+private fun createRemoteDescription(pc : PeerConnection, sdp : String){
+        Log.d("[createRemoteDescription]", "initializing")
+        val observer = object : SdpObserver {
+        override fun onCreateSuccess(sessionDescription: SessionDescription) {
+            Log.d("[createRemoteDescription]", "createRemoteDescription created with sdp $sdp")
+        }
+
+        override fun onSetSuccess() {
+        }
+        override fun onCreateFailure(error: String) {
+            Log.e("[createRemoteDescription]", "Unable to set remote description: $error")
+        }
+        override fun onSetFailure(error: String) {
+            Log.e("[createRemoteDescription]", error)
+        }
     }
 
-    val mediaConstraints = MediaConstraints().apply {
-        mandatory.add(MediaConstraints.KeyValuePair("OfferToReceiveAudio", "false"))
-        mandatory.add(MediaConstraints.KeyValuePair("OfferToReceiveVideo", "false"))
-    }
+    val answerSDP = SessionDescription(SessionDescription.Type.ANSWER, sdp)
+    pc.setRemoteDescription(observer, answerSDP)
 
-    peerConnection.createOffer(observer, mediaConstraints)
+    Log.d("[REMOTE DESCRIPTION]", "${pc.remoteDescription}")
 }

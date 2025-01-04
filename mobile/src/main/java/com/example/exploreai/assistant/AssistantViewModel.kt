@@ -9,6 +9,8 @@ import com.example.exploreai.Repository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.webrtc.PeerConnection
+import org.webrtc.SessionDescription
 
 sealed class ApiResult<out T> {
     data class Success<T>(val data: T) : ApiResult<T>()
@@ -33,13 +35,20 @@ class AssistantViewModel : ViewModel() {
     }
 
 
-    fun startSession(sdp: String){
+    fun createSession(pc: PeerConnection){
         viewModelScope.launch {
             try {
-                val result = repository.startSession(sdp)
+                createOffer(pc!!) // sets the localDescription internally
+                val result = repository.startSession(sanitizedSDP.description)
                 result.onSuccess { responseSdp ->
                     // Handle the SDP response
                     Log.d("SDP", "Received SDP: $responseSdp")
+                    val successResult: ApiResult<SessionBody> = ApiResult.Success(
+                        SessionBody(
+                            sdp = responseSdp
+                        )
+                    )
+                    _sdpResponse.value = successResult
                 }.onFailure { error ->
                     Log.e("SDP", "Error: ${error.message}")
                 }
