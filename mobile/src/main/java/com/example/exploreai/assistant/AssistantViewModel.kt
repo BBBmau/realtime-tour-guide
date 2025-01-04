@@ -1,5 +1,6 @@
 package com.example.exploreai.assistant
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -19,8 +20,8 @@ class AssistantViewModel : ViewModel() {
     private val repository = Repository()
     private val _data = MutableLiveData<ExploreAiEphemeralResp>()
     val resp: LiveData<ExploreAiEphemeralResp> = _data
-    private val _sdpResponse = MutableLiveData<ApiResult<SessionResponse>>()
-    val sessionResp : LiveData<ApiResult<SessionResponse>> = _sdpResponse
+    private val _sdpResponse = MutableLiveData<ApiResult<SessionBody>>()
+    val sessionResp : LiveData<ApiResult<SessionBody>> = _sdpResponse
 
     private val _error = MutableLiveData<String>()
     val error: LiveData<String> = _error
@@ -31,25 +32,19 @@ class AssistantViewModel : ViewModel() {
         }
     }
 
-    fun startSession(request: SessionBody){
+
+    fun startSession(sdp: String){
         viewModelScope.launch {
             try {
-                val result = withContext(Dispatchers.IO) {
-                    repository.startSession(request)
+                val result = repository.startSession(sdp)
+                result.onSuccess { responseSdp ->
+                    // Handle the SDP response
+                    Log.d("SDP", "Received SDP: $responseSdp")
+                }.onFailure { error ->
+                    Log.e("SDP", "Error: ${error.message}")
                 }
-
-                result.fold(
-                    onSuccess = { response ->
-                        _sdpResponse.value = ApiResult.Success(response)
-                    },
-                    onFailure = { exception ->
-                        _sdpResponse.value = ApiResult.Error(
-                            exception.message ?: "Unknown error occurred"
-                        )
-                    }
-                )
-            }catch (e: Exception){
-                _sdpResponse.value = ApiResult.Error(e.message ?: "Unknown error occurred")
+            } catch (e: Exception) {
+                Log.e("SDP", "Exception: ${e.message}")
             }
         }
     }

@@ -87,7 +87,7 @@ class AssistantActivityActivity : AppCompatActivity() {
 
             val sdp = createOffer(pc!!).toString() // sets the localDescription internally
             Log.d("[startSession]", "session created with sdp $sdp")
-            assistant.startSession(SessionBody(sdp))
+            assistant.startSession(sdp)
 
             assistant.sessionResp.observe(this) { resp ->
                 when (resp) {

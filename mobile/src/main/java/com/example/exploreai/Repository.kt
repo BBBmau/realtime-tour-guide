@@ -6,7 +6,6 @@ import com.example.exploreai.assistant.AssistantRequest
 import com.example.exploreai.assistant.AssistantResponse
 import com.example.exploreai.assistant.ExploreAiEphemeralResp
 import com.example.exploreai.assistant.SessionBody
-import com.example.exploreai.assistant.SessionResponse
 
 // Repository class to handle data operations
 class Repository {
@@ -23,14 +22,13 @@ class Repository {
     }
 
     // used for when user interacts with the assistant with the resp being from the assistant
-    suspend fun startSession(request: SessionBody): Result<SessionResponse> {
+    suspend fun startSession(sdp: String): Result<String> {
         return try {
-            val response = AssistantClient.openAiService.startSession(request)
+            val response = AssistantClient.apiService.startSession(sdp)
             if (response.isSuccessful) {
-                Log.d("[startSession]", "sessionResp received: ${response.body()}")
-                Result.success(response.body()!!)
+                Result.success(response.body() ?: "")
             } else {
-                Result.failure(Exception("API call failed with code: ${response.code()};\nsdp used: ${request.sdp}"))
+                Result.failure(Exception("Failed with code: ${response.code()}"))
             }
         } catch (e: Exception) {
             Result.failure(e)

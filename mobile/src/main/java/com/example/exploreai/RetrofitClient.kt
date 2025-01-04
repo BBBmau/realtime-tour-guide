@@ -11,7 +11,9 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
+import okhttp3.ResponseBody
 import retrofit2.Converter
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -23,31 +25,33 @@ class SDPConverterFactory : Converter.Factory() {
         methodAnnotations: Array<out Annotation>,
         retrofit: Retrofit
     ): Converter<*, RequestBody>? {
-        if (type == SessionBody::class.java) {
-            return SDPBodyConverter()
+        return when (type) {
+            String::class.java -> SDPBodyConverter()
+            else -> null
         }
-        return null
+    }
+
+    override fun responseBodyConverter(
+        type: Type,
+        annotations: Array<out Annotation>,
+        retrofit: Retrofit
+    ): Converter<ResponseBody, *>? {
+        return when (type) {
+            String::class.java -> SDPResponseConverter()
+            else -> null
+        }
     }
 }
 
-class SDPBodyConverter : Converter<SessionBody, RequestBody> {
-    override fun convert(value: SessionBody): RequestBody {
-        // Convert SessionBody to SDP format
-        val sdpContent = """
-            v=0
-            o=- ${System.currentTimeMillis()} 2 IN IP4 127.0.0.1
-            s=-
-            t=0 0
-            ${value.sdp}
-        """.trimIndent()
+class SDPBodyConverter : Converter<String, RequestBody> {
+    override fun convert(sdp: String): RequestBody {
+        return sdp.toRequestBody("application/sdp".toMediaType())
+    }
+}
 
-        // MediaType.parse is deprecated, use MediaType.get instead
-        return RequestBody.create(
-            "application/sdp".toMediaType(),
-            sdpContent
-        )
-        // Or use the newer syntax:
-        // return sdpContent.toRequestBody("application/sdp".toMediaType())
+class SDPResponseConverter : Converter<ResponseBody, String> {
+    override fun convert(value: ResponseBody): String {
+        return value.string()
     }
 }
 
@@ -85,6 +89,7 @@ object AssistantClient {
         Retrofit.Builder()
             .baseUrl(OPENAI_URL)
             .client(okHttpClient(EPHEMERAL_KEY).build())
+            .addConverterFactory(SDPConverterFactory())
             .build()
     }
 

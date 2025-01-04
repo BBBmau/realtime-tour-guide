@@ -11,7 +11,7 @@ interface ExploreAiAssistantService {
     suspend fun getResponse(): ExploreAiEphemeralResp
 
     @POST("/realtime?model=gpt-4o-realtime-preview-2024-12-17")
-    suspend fun startSession(@Body data: SessionBody): Response<SessionResponse>
+    suspend fun startSession(@Body data: String): Response<String>
 
     @POST("sessions")
     suspend fun sendUserResponse(@Body data: AssistantRequest): Response<AssistantResponse>
@@ -27,12 +27,8 @@ data class ClientSecret(
 )
 
 data class SessionBody(
-    val sdp : String //TODO: we need to find how to initialize a session for this value.
-)
-
-data class SessionResponse(
-    val sdpText: String
-    // ... other fields
+    val type: String,
+    val sdp: String
 )
 
 data class AssistantRequest(
