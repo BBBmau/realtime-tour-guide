@@ -14,6 +14,7 @@ import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import okhttp3.ResponseBody
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Converter
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -54,6 +55,9 @@ class SDPResponseConverter : Converter<ResponseBody, String> {
         return value.string()
     }
 }
+val logging = HttpLoggingInterceptor().apply {
+    level = HttpLoggingInterceptor.Level.BODY
+}
 
 private fun okHttpClient(ephemeralKey: String) = OkHttpClient().newBuilder()
     .addInterceptor(
@@ -68,6 +72,7 @@ private fun okHttpClient(ephemeralKey: String) = OkHttpClient().newBuilder()
             }
         }
     )
+    .addInterceptor(logging)
 
 // Singleton for Retrofit instance
 object AssistantClient {

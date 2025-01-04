@@ -24,7 +24,7 @@ class Repository {
     // used for when user interacts with the assistant with the resp being from the assistant
     suspend fun startSession(sdp: String): Result<String> {
         return try {
-            val response = AssistantClient.apiService.startSession(sdp)
+            val response = AssistantClient.openAiService.startSession(sdp, "model=gpt-4o-realtime-preview-2024-12-17")
             if (response.isSuccessful) {
                 Result.success(response.body() ?: "")
             } else {
