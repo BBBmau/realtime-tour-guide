@@ -100,9 +100,9 @@ class AssistantActivityActivity : AppCompatActivity() {
             assistant.sessionResp.observe(this) { resp ->
                 when (resp) {
                     is ApiResult.Success -> {
-                        // Handle success
-//                        createRemoteDescription(pc, resp.data.sdp)
-                        Log.d("[startSession]", "SUCCESS: sdpResp ${resp.data.sdp}")
+                        // this is the returning SDP that we get from openai, we use for answer
+                        Log.d("[startSession]", "201 SUCCESS")
+                        setRemoteDescriptionAsync(pc, SessionDescription(SessionDescription.Type.ANSWER, resp.data.sdp))
                     }
                     is ApiResult.Error -> {
                         // Handle error
@@ -335,14 +335,18 @@ private fun setLocalDescriptionAsync(
     }, description)
 }
 
-private fun createRemoteDescription(pc : PeerConnection, sdp : String){
-        Log.d("[createRemoteDescription]", "initializing")
-        val observer = object : SdpObserver {
+private fun setRemoteDescriptionAsync(
+    peerConnection: PeerConnection,
+    description: SessionDescription
+) = CompletableDeferred<Unit>().apply {
+        peerConnection.setRemoteDescription( object : SdpObserver {
         override fun onCreateSuccess(sessionDescription: SessionDescription) {
-            Log.d("[createRemoteDescription]", "createRemoteDescription created with sdp $sdp")
         }
 
         override fun onSetSuccess() {
+            Log.d("[setRemoteDescription]", "Set remote description success")
+            Log.d("[setRemoteDescription]", "remoteDescription: ${peerConnection.remoteDescription.description}")
+            complete(Unit)
         }
         override fun onCreateFailure(error: String) {
             Log.e("[createRemoteDescription]", "Unable to set remote description: $error")
@@ -350,10 +354,5 @@ private fun createRemoteDescription(pc : PeerConnection, sdp : String){
         override fun onSetFailure(error: String) {
             Log.e("[createRemoteDescription]", error)
         }
-    }
-
-    val answerSDP = SessionDescription(SessionDescription.Type.ANSWER, sdp)
-    pc.setRemoteDescription(observer, answerSDP)
-
-    Log.d("[REMOTE DESCRIPTION]", "${pc.remoteDescription}")
+    }, description)
 }
