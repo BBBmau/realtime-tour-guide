@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.provider.ContactsContract.Data
 import android.se.omapi.Session
 import android.util.Log
 import android.view.animation.Animation
@@ -25,6 +26,8 @@ import kotlinx.coroutines.coroutineScope
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.ResponseBody
+import org.json.JSONException
+import org.json.JSONObject
 import org.webrtc.AudioSource
 import org.webrtc.AudioTrack
 import org.webrtc.DataChannel
@@ -38,6 +41,7 @@ import org.webrtc.SessionDescription
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.nio.charset.Charset
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
@@ -51,6 +55,7 @@ class AssistantActivityActivity : AppCompatActivity() {
     private lateinit var speechRecognitionManager: SpeechRecognitionManager
     private lateinit var microphoneIcon: ImageView
     private lateinit var statusText: TextView
+    lateinit var dc : DataChannel
     private lateinit var pulseAnimation: Animation
     private var isSpeaking = false
     private lateinit var messageAdapter: MessageAdapter
@@ -95,7 +100,6 @@ class AssistantActivityActivity : AppCompatActivity() {
             EPHEMERAL_KEY = response.clientSecret.value
             Log.d("[EPHEMERAL KEY]", response.clientSecret.value)
         //TODO: we need to add the body that initializes the rtc session over voice
-            pc?.createDataChannel("oai-events", DataChannel.Init())
             assistant.createSession(pc!!)
             assistant.sessionResp.observe(this) { resp ->
                 when (resp) {
@@ -113,6 +117,9 @@ class AssistantActivityActivity : AppCompatActivity() {
                 }
             }
         }
+
+        dc = pc?.createDataChannel("oai-events", DataChannel.Init())!!
+        dc.registerObserver(dataChannelObserver)
 
         checkPermissionAndSetup()
 
@@ -355,4 +362,55 @@ private fun setRemoteDescriptionAsync(
             Log.e("[createRemoteDescription]", error)
         }
     }, description)
+}
+
+private fun onDataChannelMessage(buffer: DataChannel.Buffer) {
+    val data = buffer.data
+        // Handle text/JSON data
+        val jsonString = String(
+            ByteArray(data.remaining()).apply { data.get(this) },
+            Charset.forName("UTF-8")
+        )
+        try {
+            val jsonObject = JSONObject(jsonString)
+            handleJsonMessage(jsonObject)
+        } catch (e: JSONException) {
+            Log.e("DataChannel", "Failed to parse JSON: ${e.message}")
+        }
+    }
+
+// Example handler for JSON messages
+private fun handleJsonMessage(json: JSONObject) {
+    try {
+        when (json.optString("type")) {
+            "message" -> {
+                val content = json.optString("content")
+                Log.d("DataChannel", "Received message: $content")
+            }
+            "command" -> {
+                val command = json.optString("command")
+                Log.d("DataChannel", "Received command: $command")
+            }
+            else -> {
+                Log.d("DataChannel", "Unknown message type: ${json.toString()}")
+            }
+        }
+    } catch (e: Exception) {
+        Log.e("DataChannel", "Error handling JSON message: ${e.message}")
+    }
+}
+
+// Usage in DataChannel.Observer
+val dataChannelObserver = object : DataChannel.Observer {
+    override fun onMessage(buffer: DataChannel.Buffer) {
+        onDataChannelMessage(buffer)
+    }
+
+    override fun onBufferedAmountChange(amount: Long) {
+        // Handle buffered amount change
+    }
+
+    override fun onStateChange() {
+        // Handle state change
+    }
 }
