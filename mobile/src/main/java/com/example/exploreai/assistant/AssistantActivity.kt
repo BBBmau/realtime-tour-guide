@@ -88,11 +88,6 @@ class AssistantActivityActivity : AppCompatActivity() {
             .setOptions(options)
             .createPeerConnectionFactory()
         val pc = createPeerConnection(peerConnectionFactory)
-        // Create an AudioSource instance.
-        val audioSource: AudioSource = peerConnectionFactory.createAudioSource(MediaConstraints())
-        val localAudioTrack: AudioTrack = peerConnectionFactory.createAudioTrack("101", audioSource)
-
-        pc?.addTrack(localAudioTrack)
         // fetches the ephemeral key
         assistant.fetch() // TODO: only works on physical device and not emulator
         //TODO: this is meant for debugging the ephemeral key, should be removed later on.
@@ -183,6 +178,8 @@ class AssistantActivityActivity : AppCompatActivity() {
         messageAdapter.addMessage(Message(text, isFromUser))
         // Scroll to bottom
         findViewById<RecyclerView>(R.id.messageList).scrollToPosition(messageAdapter.itemCount - 1)
+
+        sendResponseCreate(dc, text)
     }
 
     private fun checkPermissionAndSetup() {
@@ -412,5 +409,6 @@ val dataChannelObserver = object : DataChannel.Observer {
 
     override fun onStateChange() {
         // Handle state change
+        Log.d("[dataChannelObserver]", "state change")
     }
 }
