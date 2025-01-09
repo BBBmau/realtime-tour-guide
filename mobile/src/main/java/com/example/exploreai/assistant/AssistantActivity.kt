@@ -34,8 +34,10 @@ import org.webrtc.DataChannel
 import org.webrtc.IceCandidate
 import org.webrtc.MediaConstraints
 import org.webrtc.MediaStream
+import org.webrtc.MediaStreamTrack
 import org.webrtc.PeerConnection
 import org.webrtc.PeerConnectionFactory
+import org.webrtc.RtpTransceiver
 import org.webrtc.SdpObserver
 import org.webrtc.SessionDescription
 import retrofit2.Call
@@ -88,6 +90,11 @@ class AssistantActivityActivity : AppCompatActivity() {
             .setOptions(options)
             .createPeerConnectionFactory()
         val pc = createPeerConnection(peerConnectionFactory)
+        pc?.addTransceiver(
+            MediaStreamTrack.MediaType.MEDIA_TYPE_AUDIO,
+            RtpTransceiver.RtpTransceiverInit(RtpTransceiver.RtpTransceiverDirection.SEND_ONLY)
+        )
+
         // fetches the ephemeral key
         assistant.fetch() // TODO: only works on physical device and not emulator
         //TODO: this is meant for debugging the ephemeral key, should be removed later on.
@@ -266,8 +273,8 @@ suspend fun createOffer(peerConnection: PeerConnection) = coroutineScope {
                 try {
                     var sdp = sessionDescription.description
 
-                    // Sanitize SDP
-                    sdp = sdp.replace("a=sendrecv", "a=sendonly")
+                    sdp = sdp.replace("a=recvonly", "a=sendonly")
+                        .replace("a=sendrecv", "a=sendonly")
                         .replace("a=setup:active", "a=setup:actpass")
 
                     sanitizedSDP = SessionDescription(
