@@ -90,6 +90,7 @@ class AssistantActivityActivity : AppCompatActivity() {
             .setOptions(options)
             .createPeerConnectionFactory()
         val pc = createPeerConnection(peerConnectionFactory)
+        Log.d("[peerConnection]","current connection state: ${pc?.connectionState()}")
         pc?.addTransceiver(
             MediaStreamTrack.MediaType.MEDIA_TYPE_AUDIO,
             RtpTransceiver.RtpTransceiverInit(RtpTransceiver.RtpTransceiverDirection.SEND_ONLY)
@@ -212,49 +213,82 @@ fun createPeerConnection(peerConnectionFactory: PeerConnectionFactory) : PeerCon
     )
 
     val rtcConfig = PeerConnection.RTCConfiguration(iceServers)
+    lateinit var peerConnection : PeerConnection
 
 // Create the peer connection instance.
-    val peerConnection = peerConnectionFactory.createPeerConnection(rtcConfig, object : PeerConnection.Observer {
+    peerConnection = peerConnectionFactory.createPeerConnection(rtcConfig, object : PeerConnection.Observer {
         override fun onSignalingChange(signalingState: PeerConnection.SignalingState) {
-            // Handle signaling state changes
+            Log.d("WebRTC", "Signaling state change: $signalingState")
         }
 
         override fun onIceConnectionChange(iceConnectionState: PeerConnection.IceConnectionState) {
-            // Handle ICE connection state changes
+            Log.d("WebRTC", "ICE connection state change: $iceConnectionState")
+            when (iceConnectionState) {
+                PeerConnection.IceConnectionState.CONNECTED -> {
+                    // Connection established
+                    Log.d("WebRTC", "ICE Connected!")
+                }
+                PeerConnection.IceConnectionState.FAILED -> {
+                    // Connection failed
+                    Log.e("WebRTC", "ICE Connection failed")
+                }
+                else -> {}
+            }
         }
 
         override fun onIceConnectionReceivingChange(receiving: Boolean) {
-            // Handle ICE connection receiving state changes
+            Log.d("WebRTC", "ICE connection receiving change: $receiving")
         }
 
         override fun onIceGatheringChange(iceGatheringState: PeerConnection.IceGatheringState) {
-            // Handle ICE gathering state changes
+            Log.d("WebRTC", "ICE gathering state: $iceGatheringState")
+            when (iceGatheringState) {
+                PeerConnection.IceGatheringState.COMPLETE -> {
+                    // ICE gathering is complete
+                    Log.d("WebRTC", "ICE gathering complete")
+                }
+                else -> {}
+            }
         }
 
         override fun onIceCandidate(iceCandidate: IceCandidate) {
-            // Handle new ICE candidates
+            // Important: Add the ICE candidate to the peer connection
+            Log.d("WebRTC", "New ICE candidate: ${iceCandidate.sdp}")
+            peerConnection.addIceCandidate(iceCandidate)
         }
 
         override fun onIceCandidatesRemoved(iceCandidates: Array<IceCandidate>) {
-            // Handle removed ICE candidates
-        }
-
-        override fun onAddStream(mediaStream: MediaStream) {
-            // Handle added media stream
-        }
-
-        override fun onRemoveStream(mediaStream: MediaStream) {
-            // Handle removed media stream
+            // Remove the ICE candidates
+            iceCandidates.forEach { candidate ->
+                peerConnection.removeIceCandidates(arrayOf(candidate))
+            }
         }
 
         override fun onDataChannel(dataChannel: DataChannel) {
-            // Handle data channel events
+            Log.d("WebRTC", "Data channel received: ${dataChannel.label()}")
+            // Store the data channel reference if needed
+            dataChannel.registerObserver(object : DataChannel.Observer {
+                override fun onBufferedAmountChange(amount: Long) {}
+
+                override fun onStateChange() {
+                    Log.d("WebRTC", "Data channel state: ${dataChannel.state()}")
+                }
+
+                override fun onMessage(buffer: DataChannel.Buffer) {
+                    // Handle incoming messages
+                }
+            })
         }
 
         override fun onRenegotiationNeeded() {
-            // Handle renegotiation needed events
+            Log.d("WebRTC", "Renegotiation needed")
+            // Usually you'd create a new offer here if needed
         }
-    })
+
+        // These are deprecated but still required
+        override fun onAddStream(mediaStream: MediaStream) {}
+        override fun onRemoveStream(mediaStream: MediaStream) {}
+    })!!
 
     if (peerConnection == null){
         Log.e("[PEER CONNECTION ERROR]", "Could not create Peer Connection")
@@ -357,6 +391,7 @@ private fun setRemoteDescriptionAsync(
         override fun onSetSuccess() {
             Log.d("[setRemoteDescription]", "Set remote description success")
             Log.d("[setRemoteDescription]", "remoteDescription: ${peerConnection.remoteDescription.description}")
+            Log.d("[peerConnection]","current connection state: ${peerConnection.connectionState()}")
             complete(Unit)
         }
         override fun onCreateFailure(error: String) {
