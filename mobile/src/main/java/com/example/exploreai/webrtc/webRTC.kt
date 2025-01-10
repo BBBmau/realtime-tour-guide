@@ -70,7 +70,9 @@ class webRTCclient {
                         // Connection failed
                         Log.e("WebRTC", "ICE Connection failed")
                     }
-                    else -> {}
+                    PeerConnection.IceConnectionState.COMPLETED ->
+                        Log.d("WebRTC", "ICE Connection Complete!")
+                    else -> {Log.e("WebRTC", "ICE connection unknown state: ${iceConnectionState.name}")}
                 }
             }
 
@@ -85,7 +87,9 @@ class webRTCclient {
                         // ICE gathering is complete
                         Log.d("WebRTC", "ICE gathering complete")
                     }
-                    else -> {}
+                    else -> {
+                        Log.e("WebRTC", "ICE gathering error")
+                    }
                 }
             }
 
