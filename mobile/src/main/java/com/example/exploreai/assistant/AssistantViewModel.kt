@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.exploreai.Repository
+import com.example.exploreai.webrtc.webRTCclient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -37,11 +38,11 @@ class AssistantViewModel : ViewModel() {
     }
 
 
-    fun createSession(pc: PeerConnection){
+    fun createSession(client: webRTCclient){
         viewModelScope.launch {
             try {
-                createOffer(pc!!) // sets the localDescription internally
-                val result = repository.startSession(sanitizedSDP.description)
+                client.createOffer(client.pc) // sets the localDescription internally
+                val result = repository.startSession(client.sanitizedSDP.description)
                 result.onSuccess { responseSdp ->
                     // Handle the SDP response
                     Log.d("SDP", "Received SDP: $responseSdp")

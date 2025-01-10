@@ -21,6 +21,7 @@ import com.example.exploreai.AssistantClient
 import com.example.exploreai.R
 import com.example.exploreai.ToggleSettingsActivity
 import com.example.exploreai.databinding.ActivityAssistantBinding
+import com.example.exploreai.webrtc.webRTCclient
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.coroutineScope
 import okhttp3.MediaType.Companion.toMediaType
@@ -54,10 +55,10 @@ val assistant = AssistantViewModel()
 
 class AssistantActivityActivity : AppCompatActivity() {
 
+    private lateinit var client : webRTCclient
     private lateinit var speechRecognitionManager: SpeechRecognitionManager
     private lateinit var microphoneIcon: ImageView
     private lateinit var statusText: TextView
-    lateinit var dc : DataChannel
     private lateinit var pulseAnimation: Animation
     private var isSpeaking = false
     private lateinit var messageAdapter: MessageAdapter
@@ -76,40 +77,23 @@ class AssistantActivityActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-
-        // TODO: AssistantActivity is getting very bloated.
-        //  we need to break this up into smaller pieces
-        // Initialize PeerConnectionFactory globals.
-        val initializationOptions = PeerConnectionFactory.InitializationOptions.builder(this)
-            .createInitializationOptions()
-        PeerConnectionFactory.initialize(initializationOptions)
-
-        // Create a new PeerConnectionFactory instance.
-        val options = PeerConnectionFactory.Options()
-        val peerConnectionFactory = PeerConnectionFactory.builder()
-            .setOptions(options)
-            .createPeerConnectionFactory()
-        val pc = createPeerConnection(peerConnectionFactory)
-        Log.d("[peerConnection]","current connection state: ${pc?.connectionState()}")
-        pc?.addTransceiver(
-            MediaStreamTrack.MediaType.MEDIA_TYPE_AUDIO,
-            RtpTransceiver.RtpTransceiverInit(RtpTransceiver.RtpTransceiverDirection.SEND_ONLY)
-        )
+//        client = webRTCclient(this)
+//        client.createPeerConnection()
 
         // fetches the ephemeral key
         assistant.fetch() // TODO: only works on physical device and not emulator
         //TODO: this is meant for debugging the ephemeral key, should be removed later on.
         assistant.resp.observe(this) { response ->
             EPHEMERAL_KEY = response.clientSecret.value
-            Log.d("[EPHEMERAL KEY]", response.clientSecret.value)
+//            Log.d("[EPHEMERAL KEY]", response.clientSecret.value)
         //TODO: we need to add the body that initializes the rtc session over voice
-            assistant.createSession(pc!!)
+//            assistant.createSession(client)
             assistant.sessionResp.observe(this) { resp ->
                 when (resp) {
                     is ApiResult.Success -> {
                         // this is the returning SDP that we get from openai, we use for answer
                         Log.d("[startSession]", "201 SUCCESS")
-                        setRemoteDescriptionAsync(pc, SessionDescription(SessionDescription.Type.ANSWER, resp.data.sdp))
+//                        client.setRemoteDescriptionAsync(SessionDescription(SessionDescription.Type.ANSWER, resp.data.sdp))
                     }
                     is ApiResult.Error -> {
                         // Handle error
@@ -120,9 +104,6 @@ class AssistantActivityActivity : AppCompatActivity() {
                 }
             }
         }
-
-        dc = pc?.createDataChannel("oai-events", DataChannel.Init())!!
-        dc.registerObserver(dataChannelObserver)
 
         checkPermissionAndSetup()
 
@@ -187,7 +168,7 @@ class AssistantActivityActivity : AppCompatActivity() {
         // Scroll to bottom
         findViewById<RecyclerView>(R.id.messageList).scrollToPosition(messageAdapter.itemCount - 1)
 
-        sendResponseCreate(dc, text)
+//        sendResponseCreate(client.dc, text)
     }
 
     private fun checkPermissionAndSetup() {
@@ -203,254 +184,5 @@ class AssistantActivityActivity : AppCompatActivity() {
                 requestPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
             }
         }
-    }
-}
-
-fun createPeerConnection(peerConnectionFactory: PeerConnectionFactory) : PeerConnection? {
-    // Configuration for the peer connection.
-    val iceServers = mutableListOf(
-        PeerConnection.IceServer.builder("stun:stun.l.google.com:19302").createIceServer()
-    )
-
-    val rtcConfig = PeerConnection.RTCConfiguration(iceServers)
-    lateinit var peerConnection : PeerConnection
-
-// Create the peer connection instance.
-    peerConnection = peerConnectionFactory.createPeerConnection(rtcConfig, object : PeerConnection.Observer {
-        override fun onSignalingChange(signalingState: PeerConnection.SignalingState) {
-            Log.d("WebRTC", "Signaling state change: $signalingState")
-        }
-
-        override fun onIceConnectionChange(iceConnectionState: PeerConnection.IceConnectionState) {
-            Log.d("WebRTC", "ICE connection state change: $iceConnectionState")
-            when (iceConnectionState) {
-                PeerConnection.IceConnectionState.CONNECTED -> {
-                    // Connection established
-                    Log.d("WebRTC", "ICE Connected!")
-                }
-                PeerConnection.IceConnectionState.FAILED -> {
-                    // Connection failed
-                    Log.e("WebRTC", "ICE Connection failed")
-                }
-                else -> {}
-            }
-        }
-
-        override fun onIceConnectionReceivingChange(receiving: Boolean) {
-            Log.d("WebRTC", "ICE connection receiving change: $receiving")
-        }
-
-        override fun onIceGatheringChange(iceGatheringState: PeerConnection.IceGatheringState) {
-            Log.d("WebRTC", "ICE gathering state: $iceGatheringState")
-            when (iceGatheringState) {
-                PeerConnection.IceGatheringState.COMPLETE -> {
-                    // ICE gathering is complete
-                    Log.d("WebRTC", "ICE gathering complete")
-                }
-                else -> {}
-            }
-        }
-
-        override fun onIceCandidate(iceCandidate: IceCandidate) {
-            // Important: Add the ICE candidate to the peer connection
-            Log.d("WebRTC", "New ICE candidate: ${iceCandidate.sdp}")
-            peerConnection.addIceCandidate(iceCandidate)
-        }
-
-        override fun onIceCandidatesRemoved(iceCandidates: Array<IceCandidate>) {
-            // Remove the ICE candidates
-            iceCandidates.forEach { candidate ->
-                peerConnection.removeIceCandidates(arrayOf(candidate))
-            }
-        }
-
-        override fun onDataChannel(dataChannel: DataChannel) {
-            Log.d("WebRTC", "Data channel received: ${dataChannel.label()}")
-            // Store the data channel reference if needed
-            dataChannel.registerObserver(object : DataChannel.Observer {
-                override fun onBufferedAmountChange(amount: Long) {}
-
-                override fun onStateChange() {
-                    Log.d("WebRTC", "Data channel state: ${dataChannel.state()}")
-                }
-
-                override fun onMessage(buffer: DataChannel.Buffer) {
-                    // Handle incoming messages
-                }
-            })
-        }
-
-        override fun onRenegotiationNeeded() {
-            Log.d("WebRTC", "Renegotiation needed")
-            // Usually you'd create a new offer here if needed
-        }
-
-        // These are deprecated but still required
-        override fun onAddStream(mediaStream: MediaStream) {}
-        override fun onRemoveStream(mediaStream: MediaStream) {}
-    })!!
-
-    if (peerConnection == null){
-        Log.e("[PEER CONNECTION ERROR]", "Could not create Peer Connection")
-        return null
-    }
-
-    return peerConnection
-}
-
-lateinit var sanitizedSDP : SessionDescription
-//TODO: move this to its own file
-suspend fun createOffer(peerConnection: PeerConnection) = coroutineScope {
-    suspendCoroutine<String> { continuation ->
-        val offerObserver = object : SdpObserver {
-            override fun onCreateSuccess(sessionDescription: SessionDescription) {
-                try {
-                    var sdp = sessionDescription.description
-
-                    sdp = sdp.replace("a=recvonly", "a=sendonly")
-                        .replace("a=sendrecv", "a=sendonly")
-                        .replace("a=setup:active", "a=setup:actpass")
-
-                    sanitizedSDP = SessionDescription(
-                        SessionDescription.Type.OFFER,
-                        sdp
-                    )
-
-                    Log.d("[createOffer]", "Setting local description with SDP: ${sanitizedSDP.description}")
-
-                    // Wait for setLocalDescription to complete
-                    setLocalDescriptionAsync(peerConnection, sanitizedSDP).invokeOnCompletion { throwable ->
-                        if (throwable != null) {
-                            continuation.resumeWithException(throwable)
-                        } else {
-                            // Only continue when local description is set
-                            peerConnection.localDescription?.let { desc ->
-                                continuation.resume(desc.description)
-                            } ?: continuation.resumeWithException(Exception("Local description is null"))
-                        }
-                    }
-                } catch (e: Exception) {
-                    continuation.resumeWithException(e)
-                }
-            }
-
-            override fun onCreateFailure(error: String) {
-                continuation.resumeWithException(Exception("Failed to create offer: $error"))
-            }
-
-            override fun onSetSuccess() {
-                Log.d("[createOffer]", "SUCCESS: set local description")
-            }
-            override fun onSetFailure(error: String) {
-                Log.d("[createOffer]", error)
-            }
-        }
-
-        val constraints = MediaConstraints().apply {
-            mandatory.add(MediaConstraints.KeyValuePair("OfferToReceiveAudio", "false"))
-            mandatory.add(MediaConstraints.KeyValuePair("OfferToReceiveVideo", "false"))
-        }
-
-        try {
-            peerConnection.createOffer(offerObserver, constraints)
-            Log.d("[createOffer]","signaling state now: ${peerConnection.signalingState()}")
-        } catch (e: Exception) {
-            continuation.resumeWithException(e)
-        }
-    }
-}
-
-private fun setLocalDescriptionAsync(
-    peerConnection: PeerConnection,
-    description: SessionDescription
-) = CompletableDeferred<Unit>().apply {
-    peerConnection.setLocalDescription(object : SdpObserver {
-        override fun onSetSuccess() {
-            Log.d("[setLocalDescription]", "Set local description success")
-            complete(Unit)
-        }
-
-        override fun onSetFailure(error: String) {
-            Log.e("[setLocalDescription]", "Set local description failed: $error")
-            completeExceptionally(Exception("Failed to set local description: $error"))
-        }
-
-        override fun onCreateSuccess(p0: SessionDescription?) {}
-        override fun onCreateFailure(p0: String?) {}
-    }, description)
-}
-
-private fun setRemoteDescriptionAsync(
-    peerConnection: PeerConnection,
-    description: SessionDescription
-) = CompletableDeferred<Unit>().apply {
-        peerConnection.setRemoteDescription( object : SdpObserver {
-        override fun onCreateSuccess(sessionDescription: SessionDescription) {
-        }
-
-        override fun onSetSuccess() {
-            Log.d("[setRemoteDescription]", "Set remote description success")
-            Log.d("[setRemoteDescription]", "remoteDescription: ${peerConnection.remoteDescription.description}")
-            Log.d("[peerConnection]","current connection state: ${peerConnection.connectionState()}")
-            complete(Unit)
-        }
-        override fun onCreateFailure(error: String) {
-            Log.e("[createRemoteDescription]", "Unable to set remote description: $error")
-        }
-        override fun onSetFailure(error: String) {
-            Log.e("[createRemoteDescription]", error)
-        }
-    }, description)
-}
-
-private fun onDataChannelMessage(buffer: DataChannel.Buffer) {
-    val data = buffer.data
-        // Handle text/JSON data
-        val jsonString = String(
-            ByteArray(data.remaining()).apply { data.get(this) },
-            Charset.forName("UTF-8")
-        )
-        try {
-            val jsonObject = JSONObject(jsonString)
-            handleJsonMessage(jsonObject)
-        } catch (e: JSONException) {
-            Log.e("DataChannel", "Failed to parse JSON: ${e.message}")
-        }
-    }
-
-// Example handler for JSON messages
-private fun handleJsonMessage(json: JSONObject) {
-    try {
-        when (json.optString("type")) {
-            "message" -> {
-                val content = json.optString("content")
-                Log.d("DataChannel", "Received message: $content")
-            }
-            "command" -> {
-                val command = json.optString("command")
-                Log.d("DataChannel", "Received command: $command")
-            }
-            else -> {
-                Log.d("DataChannel", "Unknown message type: ${json.toString()}")
-            }
-        }
-    } catch (e: Exception) {
-        Log.e("DataChannel", "Error handling JSON message: ${e.message}")
-    }
-}
-
-// Usage in DataChannel.Observer
-val dataChannelObserver = object : DataChannel.Observer {
-    override fun onMessage(buffer: DataChannel.Buffer) {
-        onDataChannelMessage(buffer)
-    }
-
-    override fun onBufferedAmountChange(amount: Long) {
-        // Handle buffered amount change
-    }
-
-    override fun onStateChange() {
-        // Handle state change
-        Log.d("[dataChannelObserver]", "state change")
     }
 }
