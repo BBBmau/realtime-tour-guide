@@ -77,23 +77,23 @@ class AssistantActivityActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-//        client = webRTCclient(this)
-//        client.createPeerConnection()
+        client = webRTCclient(this)
+        client.createPeerConnection()
 
         // fetches the ephemeral key
         assistant.fetch() // TODO: only works on physical device and not emulator
         //TODO: this is meant for debugging the ephemeral key, should be removed later on.
         assistant.resp.observe(this) { response ->
             EPHEMERAL_KEY = response.clientSecret.value
-//            Log.d("[EPHEMERAL KEY]", response.clientSecret.value)
+            Log.d("[EPHEMERAL KEY]", response.clientSecret.value)
         //TODO: we need to add the body that initializes the rtc session over voice
-//            assistant.createSession(client)
+            assistant.createSession(client)
             assistant.sessionResp.observe(this) { resp ->
                 when (resp) {
                     is ApiResult.Success -> {
                         // this is the returning SDP that we get from openai, we use for answer
                         Log.d("[startSession]", "201 SUCCESS")
-//                        client.setRemoteDescriptionAsync(SessionDescription(SessionDescription.Type.ANSWER, resp.data.sdp))
+                        client.setRemoteDescriptionAsync(SessionDescription(SessionDescription.Type.ANSWER, resp.data.sdp))
                     }
                     is ApiResult.Error -> {
                         // Handle error
@@ -168,7 +168,7 @@ class AssistantActivityActivity : AppCompatActivity() {
         // Scroll to bottom
         findViewById<RecyclerView>(R.id.messageList).scrollToPosition(messageAdapter.itemCount - 1)
 
-//        sendResponseCreate(client.dc, text)
+        sendResponseCreate(client.dc, text)
     }
 
     private fun checkPermissionAndSetup() {
