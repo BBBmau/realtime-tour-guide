@@ -145,6 +145,7 @@ class AssistantActivityActivity : AppCompatActivity() {
 
     private fun updateUI() {
         if (isSpeaking) {
+            client.pc.setAudioRecording(true)
             microphoneIcon.startAnimation(pulseAnimation)
             statusText.text = "Speaking..."
             microphoneIcon.setColorFilter(getColor(R.color.primary))
@@ -152,6 +153,7 @@ class AssistantActivityActivity : AppCompatActivity() {
             //TODO: have ui update in real-time while user is speaking
             speechRecognitionManager.startListening { result -> addNewMessage(result, true) }
         } else {
+            client.pc.setAudioRecording(false)
             microphoneIcon.clearAnimation()
             statusText.text = "Idle"
             microphoneIcon.setColorFilter(getColor(androidx.appcompat.R.color.abc_background_cache_hint_selector_material_dark))
