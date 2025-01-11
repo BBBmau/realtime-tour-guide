@@ -48,7 +48,6 @@ class webRTCclient {
         )
 
         val rtcConfig = PeerConnection.RTCConfiguration(iceServers)
-
 // Create the peer connection instance.
         pc = pcf.createPeerConnection(rtcConfig, object : PeerConnection.Observer {
             override fun onSignalingChange(signalingState: PeerConnection.SignalingState) {
@@ -62,8 +61,6 @@ class webRTCclient {
                         // Connection established
                         Log.d("WebRTC", "ICE Connected!")
                         Log.d("[peerConnection]","connection state: ${pc.connectionState()}")
-                        dc = pc.createDataChannel("oai-events", DataChannel.Init())!!
-                        dc.registerObserver(dataChannelObserver)
                         Log.d("[dataChannel]", "state: ${dc.state()}")
                     }
                     PeerConnection.IceConnectionState.FAILED -> {
@@ -135,6 +132,9 @@ class webRTCclient {
         if (pc == null){
             Log.e("[PEER CONNECTION ERROR]", "Could not create Peer Connection")
         }
+
+        dc = pc.createDataChannel("oai-events", DataChannel.Init())!!
+        dc.registerObserver(dataChannelObserver)
 
         pc.addTransceiver(
             MediaStreamTrack.MediaType.MEDIA_TYPE_AUDIO,
