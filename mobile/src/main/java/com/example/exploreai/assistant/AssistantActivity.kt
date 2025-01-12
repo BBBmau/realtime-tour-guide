@@ -77,23 +77,23 @@ class AssistantActivityActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-//        client = webRTCclient(this)
-//        client.createPeerConnection()
+        client = webRTCclient(this, this)
+        client.createPeerConnection()
 
         // fetches the ephemeral key
         assistant.fetch() // TODO: only works on physical device and not emulator
         //TODO: this is meant for debugging the ephemeral key, should be removed later on.
         assistant.resp.observe(this) { response ->
             EPHEMERAL_KEY = response.clientSecret.value
-//            Log.d("[EPHEMERAL KEY]", response.clientSecret.value)
+            Log.d("[EPHEMERAL KEY]", response.clientSecret.value)
         //TODO: we need to add the body that initializes the rtc session over voice
-//            assistant.createSession(client)
+            assistant.createSession(client)
             assistant.sessionResp.observe(this) { resp ->
                 when (resp) {
                     is ApiResult.Success -> {
                         // this is the returning SDP that we get from openai, we use for answer
                         Log.d("[startSession]", "201 SUCCESS")
-//                        client.setRemoteDescriptionAsync(SessionDescription(SessionDescription.Type.ANSWER, resp.data.sdp))
+                        client.setRemoteDescriptionAsync(SessionDescription(SessionDescription.Type.ANSWER, resp.data.sdp))
                     }
                     is ApiResult.Error -> {
                         // Handle error
@@ -145,6 +145,7 @@ class AssistantActivityActivity : AppCompatActivity() {
 
     private fun updateUI() {
         if (isSpeaking) {
+            client.pc.setAudioRecording(true)
             microphoneIcon.startAnimation(pulseAnimation)
             statusText.text = "Speaking..."
             microphoneIcon.setColorFilter(getColor(R.color.primary))
@@ -152,6 +153,7 @@ class AssistantActivityActivity : AppCompatActivity() {
             //TODO: have ui update in real-time while user is speaking
             speechRecognitionManager.startListening { result -> addNewMessage(result, true) }
         } else {
+            client.pc.setAudioRecording(false)
             microphoneIcon.clearAnimation()
             statusText.text = "Idle"
             microphoneIcon.setColorFilter(getColor(androidx.appcompat.R.color.abc_background_cache_hint_selector_material_dark))
@@ -168,7 +170,9 @@ class AssistantActivityActivity : AppCompatActivity() {
         // Scroll to bottom
         findViewById<RecyclerView>(R.id.messageList).scrollToPosition(messageAdapter.itemCount - 1)
 
-//        sendResponseCreate(client.dc, text)
+        if (isFromUser){
+            sendResponseCreate(client.dc, text)
+        }
     }
 
     private fun checkPermissionAndSetup() {

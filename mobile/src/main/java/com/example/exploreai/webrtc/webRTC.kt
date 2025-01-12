@@ -2,6 +2,8 @@ package com.example.exploreai.webrtc
 
 import android.content.Context
 import android.util.Log
+import com.example.exploreai.assistant.AssistantActivityActivity
+import com.example.exploreai.assistant.MessageAdapter
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.coroutineScope
 import org.json.JSONException
@@ -26,8 +28,12 @@ class webRTCclient {
     lateinit var dc: DataChannel
     private var pcf: PeerConnectionFactory
 
+    lateinit var assistantActivity: AssistantActivityActivity
+
     // Primary constructor with no arguments
-    constructor(ctx: Context) {
+    constructor(ctx: Context, activity: AssistantActivityActivity) {
+        assistantActivity = activity
+
         // Initialize PeerConnectionFactory globals.
         val initializationOptions = PeerConnectionFactory.InitializationOptions.builder(ctx)
             .createInitializationOptions()
@@ -48,7 +54,6 @@ class webRTCclient {
         )
 
         val rtcConfig = PeerConnection.RTCConfiguration(iceServers)
-
 // Create the peer connection instance.
         pc = pcf.createPeerConnection(rtcConfig, object : PeerConnection.Observer {
             override fun onSignalingChange(signalingState: PeerConnection.SignalingState) {
@@ -62,15 +67,15 @@ class webRTCclient {
                         // Connection established
                         Log.d("WebRTC", "ICE Connected!")
                         Log.d("[peerConnection]","connection state: ${pc.connectionState()}")
-                        dc = pc.createDataChannel("oai-events", DataChannel.Init())!!
-                        dc.registerObserver(dataChannelObserver)
                         Log.d("[dataChannel]", "state: ${dc.state()}")
                     }
                     PeerConnection.IceConnectionState.FAILED -> {
                         // Connection failed
                         Log.e("WebRTC", "ICE Connection failed")
                     }
-                    else -> {}
+                    PeerConnection.IceConnectionState.COMPLETED ->
+                        Log.d("WebRTC", "ICE Connection Complete!")
+                    else -> {Log.e("WebRTC", "ICE connection unknown state: ${iceConnectionState.name}")}
                 }
             }
 
@@ -85,7 +90,9 @@ class webRTCclient {
                         // ICE gathering is complete
                         Log.d("WebRTC", "ICE gathering complete")
                     }
-                    else -> {}
+                    else -> {
+                        Log.e("WebRTC", "ICE gathering error")
+                    }
                 }
             }
 
@@ -131,6 +138,9 @@ class webRTCclient {
         if (pc == null){
             Log.e("[PEER CONNECTION ERROR]", "Could not create Peer Connection")
         }
+
+        dc = pc.createDataChannel("oai-events", DataChannel.Init())!!
+        dc.registerObserver(dataChannelObserver)
 
         pc.addTransceiver(
             MediaStreamTrack.MediaType.MEDIA_TYPE_AUDIO,
@@ -262,19 +272,41 @@ class webRTCclient {
         try {
             when (json.optString("type")) {
                 "message" -> {
-                    val content = json.optString("content")
-                    Log.d("DataChannel", "Received message: $content")
+                    Log.d("[handleJsonMessage]", "Received message: ${json.optString("content")}")
                 }
                 "command" -> {
-                    val command = json.optString("command")
-                    Log.d("DataChannel", "Received command: $command")
+                    Log.d("[handleJsonMessage]", "Received command: ${json.optString("command")}")
+                }
+                "response.created" -> {
+                    Log.d("[handleJsonMessage]", "Received response.created: ${json.optString("response")}")
+                }
+                "response.text.done" -> {
+                    val assistantText = json.optString("text")
+                    Log.d("[handleJsonMessage]", "Received response.text.done: $assistantText")
+                    assistantActivity.addNewMessage(assistantText,false)
+                }
+                "response.done" -> {
+                    val responseObject = json.getJSONObject("response")
+                    if (responseObject.getString("status") == "failed"){
+                        val statusDetails = responseObject.getJSONObject("status_details")
+                        val errorObj = statusDetails.getJSONObject("error")
+                        val errorMsg = errorObj.getString("message")
+                        Log.d("[handleJsonMessage]", "Received response.done text: $errorMsg")
+                        assistantActivity.addNewMessage(errorMsg,false)
+                    }
+
+// Access the first item in the array as a JSONObject
+//                    val item = outputArray.getJSONObject(0)
+//
+//// Extract the "test" field from the JSONObject
+//                    val assistantText = item.getString("text")
                 }
                 else -> {
-                    Log.d("DataChannel", "Unknown message type: ${json.toString()}")
+                    Log.d("[handleJsonMessage]", "Unknown message type: $json")
                 }
             }
         } catch (e: Exception) {
-            Log.e("DataChannel", "Error handling JSON message: ${e.message}")
+            Log.e("[handleJsonMessage]", "Error handling JSON message: ${e.message}")
         }
     }
 

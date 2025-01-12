@@ -94,5 +94,6 @@ fun sendResponseCreate(dataChannel: DataChannel, msg : String) {
     // Create DataChannel.Buffer and send it
     val dataBuffer = DataChannel.Buffer(buffer, false) // 'false' because it's text-based
     Log.d("[sendResponseCreate]","sending buffer to dataChannel: ${dataBuffer.data}")
+    Log.d("[sendResponseCreate]","dataChannel state: ${dataChannel.state()}")
     dataChannel.send(dataBuffer)
 }
