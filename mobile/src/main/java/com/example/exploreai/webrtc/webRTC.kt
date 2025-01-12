@@ -266,19 +266,23 @@ class webRTCclient {
         try {
             when (json.optString("type")) {
                 "message" -> {
-                    val content = json.optString("content")
-                    Log.d("DataChannel", "Received message: $content")
+                    Log.d("[handleJsonMessage]", "Received message: ${json.optString("content")}")
                 }
                 "command" -> {
-                    val command = json.optString("command")
-                    Log.d("DataChannel", "Received command: $command")
+                    Log.d("[handleJsonMessage]", "Received command: ${json.optString("command")}")
+                }
+                "response.created" -> {
+                    Log.d("[handleJsonMessage]", "Received response.created: ${json.optString("response")}")
+                }
+                "response.text.done" -> {
+                    Log.d("[handleJsonMessage]", "Received response.text.done: ${json.optString("text")}")
                 }
                 else -> {
-                    Log.d("DataChannel", "Unknown message type: ${json.toString()}")
+                    Log.d("[handleJsonMessage]", "Unknown message type: $json")
                 }
             }
         } catch (e: Exception) {
-            Log.e("DataChannel", "Error handling JSON message: ${e.message}")
+            Log.e("[handleJsonMessage]", "Error handling JSON message: ${e.message}")
         }
     }
 
