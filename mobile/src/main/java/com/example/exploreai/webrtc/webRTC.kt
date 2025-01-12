@@ -280,9 +280,9 @@ class webRTCclient {
                 "response.created" -> {
                     Log.d("[handleJsonMessage]", "Received response.created: ${json.optString("response")}")
                 }
-                "response.text.done" -> {
-                    val assistantText = json.optString("text")
-                    Log.d("[handleJsonMessage]", "Received response.text.done: $assistantText")
+                "response.audio_transcript.done" -> {
+                    val assistantText = json.optString("transcript")
+                    Log.d("[handleJsonMessage]", "Received response.audio_transcript.done: $assistantText")
                     assistantActivity.addNewMessage(assistantText,false)
                 }
                 "response.done" -> {

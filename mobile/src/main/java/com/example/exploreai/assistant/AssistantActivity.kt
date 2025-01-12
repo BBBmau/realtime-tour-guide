@@ -78,7 +78,6 @@ class AssistantActivityActivity : AppCompatActivity() {
 
         val messageList = findViewById<RecyclerView>(R.id.messageList)
         messageAdapter = MessageAdapter()
-
         messageList.apply {
             layoutManager = LinearLayoutManager(context).apply {
                 stackFromEnd = true  // Messages start from bottom
@@ -129,10 +128,11 @@ class AssistantActivityActivity : AppCompatActivity() {
 
     // Function to add new messages
     fun addNewMessage(text: String, isFromUser: Boolean) {
-        messageAdapter.addMessage(Message(text, isFromUser))
-        // Scroll to bottom
-        findViewById<RecyclerView>(R.id.messageList).scrollToPosition(messageAdapter.itemCount - 1)
-
+        runOnUiThread {
+            messageAdapter.addMessage(Message(text, isFromUser))
+            // Scroll to bottom
+            findViewById<RecyclerView>(R.id.messageList).scrollToPosition(messageAdapter.itemCount - 1)
+        }
         if (isFromUser){
             sendResponseCreate(client.dc, text)
         }
