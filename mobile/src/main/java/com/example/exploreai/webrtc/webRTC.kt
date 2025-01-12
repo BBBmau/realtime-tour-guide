@@ -3,7 +3,7 @@ package com.example.exploreai.webrtc
 import android.content.Context
 import android.util.Log
 import com.example.exploreai.assistant.AssistantActivityActivity
-import com.example.exploreai.assistant.MessageAdapter
+import com.google.gson.Gson
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.coroutineScope
 import org.json.JSONException
@@ -18,6 +18,7 @@ import org.webrtc.PeerConnectionFactory
 import org.webrtc.RtpTransceiver
 import org.webrtc.SdpObserver
 import org.webrtc.SessionDescription
+import java.nio.ByteBuffer
 import java.nio.charset.Charset
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -271,12 +272,6 @@ class webRTCclient {
     private fun handleJsonMessage(json: JSONObject) {
         try {
             when (json.optString("type")) {
-                "message" -> {
-                    Log.d("[handleJsonMessage]", "Received message: ${json.optString("content")}")
-                }
-                "command" -> {
-                    Log.d("[handleJsonMessage]", "Received command: ${json.optString("command")}")
-                }
                 "response.created" -> {
                     Log.d("[handleJsonMessage]", "Received response.created: ${json.optString("response")}")
                 }
@@ -284,6 +279,25 @@ class webRTCclient {
                     val assistantText = json.optString("transcript")
                     Log.d("[handleJsonMessage]", "Received response.audio_transcript.done: $assistantText")
                     assistantActivity.addNewMessage(assistantText,false)
+                }
+                "conversation.item.input_audio_transcription.completed" -> {
+                    val assistantText = json.optString("transcript")
+                    Log.d("[handleJsonMessage]", "Received conversation.item.input_audio_transcription.completed: $assistantText")
+                    assistantActivity.addNewMessage(assistantText,true)
+                }
+                "session.created" -> {
+                    val event = Event(
+                        event_id = "transcription_update",
+                        type = "session.update",
+                        session = Session(
+                            input_audio_transcription = InputAudioTranscription(model = "whisper-1")
+                        )
+                    )
+                    val eventJson = Gson().toJson(event)
+
+// Serialize to JSON string
+                    val byteBuffer = ByteBuffer.wrap(eventJson.toByteArray(Charsets.UTF_8))
+                    dc.send(DataChannel.Buffer(byteBuffer, false))
                 }
                 "response.done" -> {
                     val responseObject = json.getJSONObject("response")
@@ -326,3 +340,15 @@ class webRTCclient {
         }
     }
 }
+
+data class Event(
+    val event_id: String,
+    val type: String,
+    val session: Session
+)
+
+data class Session(
+    val input_audio_transcription: InputAudioTranscription
+)
+
+data class InputAudioTranscription(val model: String)
