@@ -77,7 +77,7 @@ class AssistantActivityActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        client = webRTCclient(this)
+        client = webRTCclient(this, this)
         client.createPeerConnection()
 
         // fetches the ephemeral key
@@ -170,7 +170,9 @@ class AssistantActivityActivity : AppCompatActivity() {
         // Scroll to bottom
         findViewById<RecyclerView>(R.id.messageList).scrollToPosition(messageAdapter.itemCount - 1)
 
-        sendResponseCreate(client.dc, text)
+        if (isFromUser){
+            sendResponseCreate(client.dc, text)
+        }
     }
 
     private fun checkPermissionAndSetup() {

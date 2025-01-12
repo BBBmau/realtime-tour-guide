@@ -2,6 +2,8 @@ package com.example.exploreai.webrtc
 
 import android.content.Context
 import android.util.Log
+import com.example.exploreai.assistant.AssistantActivityActivity
+import com.example.exploreai.assistant.MessageAdapter
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.coroutineScope
 import org.json.JSONException
@@ -26,8 +28,12 @@ class webRTCclient {
     lateinit var dc: DataChannel
     private var pcf: PeerConnectionFactory
 
+    lateinit var assistantActivity: AssistantActivityActivity
+
     // Primary constructor with no arguments
-    constructor(ctx: Context) {
+    constructor(ctx: Context, activity: AssistantActivityActivity) {
+        assistantActivity = activity
+
         // Initialize PeerConnectionFactory globals.
         val initializationOptions = PeerConnectionFactory.InitializationOptions.builder(ctx)
             .createInitializationOptions()
@@ -275,7 +281,25 @@ class webRTCclient {
                     Log.d("[handleJsonMessage]", "Received response.created: ${json.optString("response")}")
                 }
                 "response.text.done" -> {
-                    Log.d("[handleJsonMessage]", "Received response.text.done: ${json.optString("text")}")
+                    val assistantText = json.optString("text")
+                    Log.d("[handleJsonMessage]", "Received response.text.done: $assistantText")
+                    assistantActivity.addNewMessage(assistantText,false)
+                }
+                "response.done" -> {
+                    val responseObject = json.getJSONObject("response")
+                    if (responseObject.getString("status") == "failed"){
+                        val statusDetails = responseObject.getJSONObject("status_details")
+                        val errorObj = statusDetails.getJSONObject("error")
+                        val errorMsg = errorObj.getString("message")
+                        Log.d("[handleJsonMessage]", "Received response.done text: $errorMsg")
+                        assistantActivity.addNewMessage(errorMsg,false)
+                    }
+
+// Access the first item in the array as a JSONObject
+//                    val item = outputArray.getJSONObject(0)
+//
+//// Extract the "test" field from the JSONObject
+//                    val assistantText = item.getString("text")
                 }
                 else -> {
                     Log.d("[handleJsonMessage]", "Unknown message type: $json")
