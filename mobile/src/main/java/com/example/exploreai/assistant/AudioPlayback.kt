@@ -4,10 +4,13 @@ import android.media.AudioAttributes
 import android.media.AudioFormat
 import android.media.AudioTrack
 import android.media.AudioTrack.MODE_STREAM
+import kotlin.concurrent.thread
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 
 class AudioPlayback {
     private var audioTrack: AudioTrack
-
+    private var bufferSize: Int
     init {
         // Set up audio attributes
         val audioAttributes = AudioAttributes.Builder()
@@ -21,7 +24,7 @@ class AudioPlayback {
         val encoding = AudioFormat.ENCODING_PCM_16BIT
 
         // Calculate buffer size
-        val bufferSize = AudioTrack.getMinBufferSize(sampleRate, channelConfig, encoding)
+        bufferSize = AudioTrack.getMinBufferSize(sampleRate, channelConfig, encoding)
 
         audioTrack = AudioTrack(
             audioAttributes,
@@ -34,5 +37,33 @@ class AudioPlayback {
             MODE_STREAM,
             101
         )
+    }
+
+    @OptIn(ExperimentalEncodingApi::class)
+    private fun playAudio(base64Audio: String) {
+        val pcmData: ByteArray = Base64.decode(base64Audio)
+
+        // Start playback in a separate thread
+        thread {
+            try {
+                // Start the audio track for playback
+                audioTrack.play()
+
+                // Write decoded PCM data to the AudioTrack
+                var offset = 0
+                while (offset < pcmData.size) {
+                    val writeSize = minOf(bufferSize, pcmData.size - offset)
+                    audioTrack.write(pcmData, offset, writeSize)
+                    offset += writeSize
+                }
+
+                // Stop and release resources after playback is complete
+                audioTrack.stop()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            } finally {
+                audioTrack.release()
+            }
+        }
     }
 }

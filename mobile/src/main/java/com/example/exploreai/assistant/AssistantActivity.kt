@@ -28,6 +28,7 @@ val assistant = AssistantViewModel()
 class AssistantActivityActivity : AppCompatActivity() {
 
     private lateinit var client : webRTCclient
+    private  val audioPlayback = AudioPlayback()
     private lateinit var speechRecognitionManager: SpeechRecognitionManager
     private lateinit var microphoneIcon: ImageView
     private lateinit var statusText: TextView
@@ -52,7 +53,7 @@ class AssistantActivityActivity : AppCompatActivity() {
         client = webRTCclient(this, this)
         client.createPeerConnection()
 
-        // fetches the ephemeral key
+        // TODO: ephemeral key fetch should only be requested when expired.
         assistant.fetch() // TODO: only works on physical device and not emulator
         assistant.resp.observe(this) { response ->
             EPHEMERAL_KEY = response.clientSecret.value

@@ -275,6 +275,9 @@ class webRTCclient {
                 "response.created" -> {
                     Log.d("[handleJsonMessage]", "Received response.created: ${json.optString("response")}")
                 }
+                "response.audio.delta" -> {
+                    Log.d("[handleJsonMessage]", "Received response.audio.delta: ${json.optString("response")}")
+                }
                 "response.audio_transcript.done" -> {
                     val assistantText = json.optString("transcript")
                     Log.d("[handleJsonMessage]", "Received response.audio_transcript.done: $assistantText")
