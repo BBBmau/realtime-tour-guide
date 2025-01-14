@@ -37,29 +37,33 @@ class AssistantViewModel : ViewModel() {
         }
     }
 
-
-    fun createSession(client: webRTCclient){
-        viewModelScope.launch {
+    suspend fun createSession(client: webRTCclient): ApiResult<SessionBody> {
+        return withContext(Dispatchers.IO) {
             try {
-                client.createOffer(client.pc) // sets the localDescription internally
+                // Step 1: Create an offer (sets localDescription internally)
+                client.createOffer(client.pc)
+
+                // Step 2: Start session using the sanitized SDP
                 val result = repository.startSession(client.sanitizedSDP.description)
-                result.onSuccess { responseSdp ->
-                    // Handle the SDP response
-                    Log.d("SDP", "Received SDP: $responseSdp")
-                    val successResult: ApiResult<SessionBody> = ApiResult.Success(
-                        SessionBody(
-                            sdp = responseSdp
-                        )
-                    )
-                    _sdpResponse.value = successResult
-                }.onFailure { error ->
-                    Log.e("SDP", "Error: ${error.message}")
-                }
+
+                // Step 3: Handle success or failure
+                result.fold(
+                    onSuccess = { responseSdp ->
+                        Log.d("SDP", "Received SDP: $responseSdp")
+                        ApiResult.Success(SessionBody(sdp = responseSdp))
+                    },
+                    onFailure = { error ->
+                        Log.e("SDP", "Error: ${error.message}")
+                        ApiResult.Error(error.message ?: "Unknown error")
+                    }
+                )
             } catch (e: Exception) {
                 Log.e("SDP", "Exception: ${e.message}")
+                ApiResult.Error(e.message ?: "Exception occurred")
             }
         }
     }
+
 }
 
 // Define your data model (same as above)

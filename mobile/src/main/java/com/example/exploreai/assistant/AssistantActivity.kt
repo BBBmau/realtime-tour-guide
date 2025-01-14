@@ -13,12 +13,14 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.exploreai.R
 import com.example.exploreai.ToggleSettingsActivity
 import com.example.exploreai.databinding.ActivityAssistantBinding
 import com.example.exploreai.webrtc.webRTCclient
+import kotlinx.coroutines.launch
 import org.webrtc.SessionDescription
 
 
@@ -51,7 +53,6 @@ class AssistantActivityActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         client = webRTCclient(this, this)
-        client.createPeerConnection()
 
         // TODO: ephemeral key fetch should only be requested when expired.
         assistant.fetch() // TODO: only works on physical device and not emulator
@@ -108,21 +109,31 @@ class AssistantActivityActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAssistantBinding
 
-    private fun startRealtimeSession(){
-        assistant.createSession(client)
-        assistant.sessionResp.observe(this) { resp ->
-            when (resp) {
-                is ApiResult.Success -> {
-                    // this is the returning SDP that we get from openai, we use for answer
-                    Log.d("[startSession]", "201 SUCCESS")
-                    client.setRemoteDescriptionAsync(SessionDescription(SessionDescription.Type.ANSWER, resp.data.sdp))
+    private fun startRealtimeSession() {
+        lifecycleScope.launch {
+            try {
+                // Step 1: Create Peer Connection
+                client.createPeerConnection()
+
+                // Step 3: Observe the session response and handle it
+                when (val sessionResult = assistant.createSession(client)) {
+                    is ApiResult.Success -> {
+                        Log.d("[startSession]", "201 SUCCESS")
+                        client.setRemoteDescriptionAsync(
+                            SessionDescription(SessionDescription.Type.ANSWER, sessionResult.data.sdp)
+                        )
+                    }
+                    is ApiResult.Error -> {
+                        Toast.makeText(applicationContext, sessionResult.message, Toast.LENGTH_SHORT).show()
+                        Log.e("[API ERROR]", sessionResult.message)
+                    }
+                    else -> {
+                        Toast.makeText(applicationContext, "Unknown sessionResp error", Toast.LENGTH_SHORT).show()
+                    }
                 }
-                is ApiResult.Error -> {
-                    // Handle error
-                    Toast.makeText(this, resp.message, Toast.LENGTH_SHORT).show()
-                    Log.e("[API ERROR]", resp.message)
-                }
-                else -> { Toast.makeText(this, "unknown sessionResp error", Toast.LENGTH_SHORT).show()}
+            } catch (e: Exception) {
+                // Handle any exceptions that occur during the process
+                Log.e("[startSession]", "Error: ${e.message}")
             }
         }
     }
