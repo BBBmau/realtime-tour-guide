@@ -12,10 +12,10 @@ class ToggleSettingsActivity : AppCompatActivity() {
         binding = ActivitySettingsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setupToggleListeners()
+        setupLissteners()
     }
 
-    private fun setupToggleListeners() {
+    private fun setupLissteners() {
         binding.notificationSwitch.setOnCheckedChangeListener { _, isChecked ->
             // Handle notification toggle
         }
@@ -27,5 +27,7 @@ class ToggleSettingsActivity : AppCompatActivity() {
         binding.soundSwitch.setOnCheckedChangeListener { _, isChecked ->
             // Handle sound toggle
         }
+
+        binding.topAppBar.setNavigationOnClickListener { finish() }
     }
 }

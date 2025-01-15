@@ -85,6 +85,7 @@
                     android:background="#E0E0E0" />
 
                 <Button
+                    android:id="@+id/conversationHistoryButton"
                     android:layout_marginTop="55dp"
                     android:padding="5dp"
                     android:text="Conversation History"
@@ -92,6 +93,7 @@
                     android:layout_height="wrap_content"/>
 
                 <Button
+                    android:id="@+id/logoutButton"
                     android:layout_margin="20dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
