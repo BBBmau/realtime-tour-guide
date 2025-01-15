@@ -154,7 +154,7 @@ class AssistantActivityActivity : AppCompatActivity() {
         when {
             ContextCompat.checkSelfPermission(
                 this,
-                Manifest.permission.RECORD_AUDIO
+                Manifest.permission.RECORD_AUDIO,
             ) == PackageManager.PERMISSION_GRANTED -> {
                 Log.d("Assistant", "Assistant received permissions to listen")
                 speechRecognitionManager = SpeechRecognitionManager(this)
@@ -163,5 +163,28 @@ class AssistantActivityActivity : AppCompatActivity() {
                 requestPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
             }
         }
+    when{
+        ContextCompat.checkSelfPermission(
+            this,
+            Manifest.permission.MODIFY_AUDIO_SETTINGS,
+        ) == PackageManager.PERMISSION_GRANTED -> {
+            Log.d("Assistant", "Assistant received permissions to speak")
+        }
+        else -> {
+            requestPermissionLauncher.launch(Manifest.permission.MODIFY_AUDIO_SETTINGS)
+        }
+    }
+        when{
+            ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.READ_MEDIA_AUDIO,
+            ) == PackageManager.PERMISSION_GRANTED -> {
+                Log.d("Assistant", "Assistant received permissions to speak")
+            }
+            else -> {
+                requestPermissionLauncher.launch(Manifest.permission.READ_MEDIA_AUDIO)
+            }
+        }
+
     }
 }
