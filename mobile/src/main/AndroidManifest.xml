@@ -36,6 +36,8 @@
             android:exported="false" />
 
         <activity android:name=".assistant.AssistantActivityActivity"/>
+
+        <activity android:name=".ConversationHistoryListActivity"/>
     </application>
 
 </manifest>

@@ -1,5 +1,6 @@
 package com.example.exploreai
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.exploreai.databinding.ActivitySettingsBinding
@@ -16,6 +17,8 @@ class ToggleSettingsActivity : AppCompatActivity() {
     }
 
     private fun setupLissteners() {
+        binding.topAppBar.setNavigationOnClickListener { finish() }
+
         binding.notificationSwitch.setOnCheckedChangeListener { _, isChecked ->
             // Handle notification toggle
         }
@@ -28,6 +31,9 @@ class ToggleSettingsActivity : AppCompatActivity() {
             // Handle sound toggle
         }
 
-        binding.topAppBar.setNavigationOnClickListener { finish() }
+        binding.conversationHistoryButton.setOnClickListener {
+            startActivity(Intent(this, ConversationHistoryListActivity::class.java))
+        }
+
     }
 }
