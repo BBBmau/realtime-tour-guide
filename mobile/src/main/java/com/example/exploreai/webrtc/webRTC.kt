@@ -57,6 +57,13 @@ class webRTCclient {
         val rtcConfig = PeerConnection.RTCConfiguration(iceServers)
 // Create the peer connection instance.
         pc = pcf.createPeerConnection(rtcConfig, object : PeerConnection.Observer {
+            override fun onTrack(transceiver: RtpTransceiver?) {
+                val receiver = transceiver?.receiver
+                val track = receiver?.track()
+                Log.d("[onTrack]", "Received audio track: ${track?.id()}")
+            }
+
+
             override fun onSignalingChange(signalingState: PeerConnection.SignalingState) {
                 Log.d("WebRTC", "Signaling state change: $signalingState")
             }
@@ -145,7 +152,7 @@ class webRTCclient {
 
         pc.addTransceiver(
             MediaStreamTrack.MediaType.MEDIA_TYPE_AUDIO,
-            RtpTransceiver.RtpTransceiverInit(RtpTransceiver.RtpTransceiverDirection.SEND_ONLY)
+            RtpTransceiver.RtpTransceiverInit(RtpTransceiver.RtpTransceiverDirection.SEND_RECV)
         )
     }
 
@@ -158,9 +165,7 @@ class webRTCclient {
                     try {
                         var sdp = sessionDescription.description
 
-                        sdp = sdp.replace("a=recvonly", "a=sendonly")
-                            .replace("a=sendrecv", "a=sendonly")
-                            .replace("a=setup:active", "a=setup:actpass")
+                        sdp = sdp.replace("a=setup:active", "a=setup:actpass")
 
                         sanitizedSDP = SessionDescription(
                             SessionDescription.Type.OFFER,
