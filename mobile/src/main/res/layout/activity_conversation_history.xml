@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ConversationHistoryListActivity">
+    tools:context=".settings.ConversationHistoryListActivity">
 
     <!-- AppBarLayout -->
     <com.google.android.material.appbar.AppBarLayout
@@ -23,12 +23,12 @@
     </com.google.android.material.appbar.AppBarLayout>
 
     <!-- ListView for sessions -->
-    <ListView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/conversationListView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="?attr/actionBarSize"
         android:divider="@android:color/darker_gray"
         android:dividerHeight="1dp"
-        android:padding="8dp" />
+        android:padding="30dp" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

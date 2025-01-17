@@ -17,7 +17,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.exploreai.R
-import com.example.exploreai.ToggleSettingsActivity
+import com.example.exploreai.settings.ToggleSettingsActivity
 import com.example.exploreai.databinding.ActivityAssistantBinding
 import com.example.exploreai.webrtc.webRTCclient
 import kotlinx.coroutines.launch

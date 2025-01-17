@@ -1,4 +1,4 @@
-package com.example.exploreai
+package com.example.exploreai.settings
 
 import android.content.Intent
 import android.os.Bundle

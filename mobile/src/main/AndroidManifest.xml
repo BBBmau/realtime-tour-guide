@@ -34,12 +34,12 @@
             android:exported="false" />
 
         <activity
-            android:name=".ToggleSettingsActivity"
+            android:name=".settings.ToggleSettingsActivity"
             android:exported="false" />
 
         <activity android:name=".assistant.AssistantActivityActivity"/>
 
-        <activity android:name=".ConversationHistoryListActivity"/>
+        <activity android:name=".settings.ConversationHistoryListActivity"/>
     </application>
 
 </manifest>
