@@ -17,7 +17,8 @@ import com.google.android.material.appbar.MaterialToolbar
 
 data class Session(
     val id: Int,
-    val name: String,
+    val start: String,
+    val destination: String,
     val description: String
 )
 
@@ -27,8 +28,9 @@ class SessionAdapter(
 ) : RecyclerView.Adapter<SessionAdapter.SessionViewHolder>() {
 
     class SessionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val nameTextView: TextView = itemView.findViewById(R.id.sessionNameTextView)
-        val descriptionTextView: TextView = itemView.findViewById(R.id.sessionDescriptionTextView)
+        val startTextView: TextView = itemView.findViewById(R.id.sessionStartTextView)
+        val destinationTextView: TextView = itemView.findViewById(R.id.sessionDestinationTextView)
+        val sessionDateTimeTextView: TextView = itemView.findViewById(R.id.sessionDateTimeTextView)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SessionViewHolder {
@@ -38,8 +40,9 @@ class SessionAdapter(
 
     override fun onBindViewHolder(holder: SessionViewHolder, position: Int) {
         val session = sessions[position]
-        holder.nameTextView.text = session.name
-        holder.descriptionTextView.text = session.description
+        holder.startTextView.text = session.start
+        holder.destinationTextView.text = session.destination
+        holder.sessionDateTimeTextView.text = session.description
 
         // Set click listener for the entire item view
         holder.itemView.setOnClickListener {
@@ -62,21 +65,21 @@ class ConversationHistoryListActivity : AppCompatActivity() {
         val recyclerList = findViewById<RecyclerView>(R.id.conversationListView)
         // Sample data for sessions
         val sessions = listOf(
-            Session(1, "Session 1", "This is the first session."),
-            Session(2, "Session 2", "This is the second session."),
-            Session(3, "Session 3", "This is the third session."),
-            Session(1, "Session 1", "This is the first session."),
-            Session(2, "Session 2", "This is the second session."),
-            Session(3, "Session 3", "This is the third session."),
-            Session(1, "Session 1", "This is the first session."),
-            Session(2, "Session 2", "This is the second session."),
-            Session(3, "Session 3", "This is the third session.")
+            Session(1, "La Jolla, CA", "Irvine, CA", "January 16, 2024"),
+            Session(2, "Cathedral City, CA", "La Quinta, CA", "February 26, 2024"),
+//            Session(3, "Session 3", "This is the third session."),
+//            Session(1, "Session 1", "This is the first session."),
+//            Session(2, "Session 2", "This is the second session."),
+//            Session(3, "Session 3", "This is the third session."),
+//            Session(1, "Session 1", "This is the first session."),
+//            Session(2, "Session 2", "This is the second session."),
+//            Session(3, "Session 3", "This is the third session.")
         )
 
 // Create adapter with a click listener
         val adapter = SessionAdapter(sessions) { selectedSession ->
             // Handle item click here
-            Toast.makeText(this, "Clicked on ${selectedSession.name}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Clicked on ${selectedSession.start} -> ${selectedSession.destination}", Toast.LENGTH_SHORT).show()
 
             // Example: Navigate to another activity
             // val intent = Intent(this, SessionDetailActivity::class.java)
