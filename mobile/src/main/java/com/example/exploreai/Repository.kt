@@ -2,13 +2,31 @@ package com.example.exploreai
 
 import android.companion.AssociatedDevice
 import android.util.Log
+import androidx.annotation.WorkerThread
 import com.example.exploreai.assistant.AssistantRequest
 import com.example.exploreai.assistant.AssistantResponse
 import com.example.exploreai.assistant.ExploreAiEphemeralResp
 import com.example.exploreai.assistant.SessionBody
+import kotlinx.coroutines.flow.Flow
 
 // Repository class to handle data operations
-class Repository {
+class Repository(private val conversationDao: ConversationDao) {
+
+
+    // Room executes all queries on a separate thread.
+    // Observed Flow will notify the observer when the data has changed.
+    val allConversations: Flow<List<Conversation>> = conversationDao.getAll()
+
+    // By default Room runs suspend queries off the main thread, therefore, we don't need to
+    // implement anything else to ensure we're not doing long running database work
+    // off the main thread.
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    suspend fun insert(conversation: Conversation) {
+        conversationDao.insertConversation(conversation)
+    }
+
+
     // the fetch is for the ephemeral key
     suspend fun fetch(): ExploreAiEphemeralResp? {
         return try{

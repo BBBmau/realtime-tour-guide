@@ -1,5 +1,6 @@
 package com.example.exploreai
 
+import android.content.Context
 import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Database
@@ -8,7 +9,39 @@ import androidx.room.Entity
 import androidx.room.Insert
 import androidx.room.PrimaryKey
 import androidx.room.Query
+import androidx.room.Room
 import androidx.room.RoomDatabase
+import kotlinx.coroutines.flow.Flow
+
+// Annotates class to be a Room Database with a table (entity) of the Conversation class
+@Database(entities = arrayOf(Conversation::class), version = 1, exportSchema = false)
+public abstract class ConversationRoomDatabase : RoomDatabase() {
+
+    abstract fun conversationDAO(): ConversationDao
+
+    companion object {
+        // Singleton prevents multiple instances of database opening at the
+        // same time.
+        @Volatile
+        private var INSTANCE: ConversationRoomDatabase? = null
+
+        fun getDatabase(context: Context): ConversationRoomDatabase {
+            // if the INSTANCE is not null, then return it,
+            // if it is, then create the database
+            return INSTANCE ?: synchronized(this) {
+                val instance = Room.databaseBuilder(
+                    context.applicationContext,
+                    ConversationRoomDatabase::class.java,
+                    "conversation_database"
+                ).build()
+                INSTANCE = instance
+                // return instance
+                instance
+            }
+        }
+    }
+}
+
 
 @Database(entities = [Conversation::class], version = 1)
 abstract class AppDatabase : RoomDatabase() {
@@ -18,8 +51,8 @@ abstract class AppDatabase : RoomDatabase() {
 
 @Dao
 interface ConversationDao {
-    @Query("SELECT * FROM conversation")
-    fun getAll(): List<Conversation>
+    @Query("SELECT * FROM conversation_table")
+    fun getAll(): Flow<List<Conversation>>
 
     @Insert
     fun insertConversation(conversation: Conversation)
@@ -28,7 +61,7 @@ interface ConversationDao {
     fun delete(conversation: Conversation)
 }
 
-@Entity
+@Entity(tableName = "conversation_table")
 data class Conversation(
     @PrimaryKey val conversationId: Int,
     @ColumnInfo(name = "date") val date: String?,
@@ -39,14 +72,14 @@ data class Conversation(
 
 @Dao
 interface MessagenDao {
-    @Query("SELECT * FROM message")
-    fun getAll(): List<Message>
+    @Query("SELECT * FROM message_table")
+    fun getAll(): Flow<List<Message>>
 
     @Insert
     fun insertMessage(message: Message)
 }
 
-@Entity
+@Entity(tableName = "message_table")
 data class Message(
     @PrimaryKey val messageId: Int,
     @ColumnInfo(name = "conversation_id") val conversationId: Conversation,
