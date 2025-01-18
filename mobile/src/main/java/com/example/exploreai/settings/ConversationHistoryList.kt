@@ -19,7 +19,8 @@ data class Session(
     val id: Int,
     val start: String,
     val destination: String,
-    val description: String
+    val date: String,
+    val time: String,
 )
 
 class SessionAdapter(
@@ -30,7 +31,8 @@ class SessionAdapter(
     class SessionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val startTextView: TextView = itemView.findViewById(R.id.sessionStartTextView)
         val destinationTextView: TextView = itemView.findViewById(R.id.sessionDestinationTextView)
-        val sessionDateTimeTextView: TextView = itemView.findViewById(R.id.sessionDateTimeTextView)
+        val sessionDateTextView: TextView = itemView.findViewById(R.id.sessionDateTextView)
+        val sessionTimeTextView: TextView = itemView.findViewById(R.id.sessionTimeTextView)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SessionViewHolder {
@@ -42,7 +44,8 @@ class SessionAdapter(
         val session = sessions[position]
         holder.startTextView.text = session.start
         holder.destinationTextView.text = session.destination
-        holder.sessionDateTimeTextView.text = session.description
+        holder.sessionDateTextView.text = session.date
+        holder.sessionTimeTextView.text = session.time
 
         // Set click listener for the entire item view
         holder.itemView.setOnClickListener {
@@ -65,8 +68,26 @@ class ConversationHistoryListActivity : AppCompatActivity() {
         val recyclerList = findViewById<RecyclerView>(R.id.conversationListView)
         // Sample data for sessions
         val sessions = listOf(
-            Session(1, "La Jolla, CA", "Irvine, CA", "January 16, 2024"),
-            Session(2, "Cathedral City, CA", "La Quinta, CA", "February 26, 2024"),
+            Session(1, "La Jolla, CA", "Irvine, CA", "January 16, 2024", "3:00pm"),
+            Session(2, "Cathedral City, CA", "La Quinta, CA", "February 26, 2024", "12:00pm"),
+            Session(1, "La Jolla, CA", "Irvine, CA", "January 16, 2024", "3:00pm"),
+            Session(2, "Cathedral City, CA", "La Quinta, CA", "February 26, 2024", "12:00pm"),
+            Session(1, "La Jolla, CA", "Irvine, CA", "January 16, 2024", "3:00pm"),
+            Session(2, "Cathedral City, CA", "La Quinta, CA", "February 26, 2024", "12:00pm"),
+            Session(1, "La Jolla, CA", "Irvine, CA", "January 16, 2024", "3:00pm"),
+            Session(2, "Cathedral City, CA", "La Quinta, CA", "February 26, 2024", "12:00pm"),
+            Session(1, "La Jolla, CA", "Irvine, CA", "January 16, 2024", "3:00pm"),
+            Session(2, "Cathedral City, CA", "La Quinta, CA", "February 26, 2024", "12:00pm"),
+            Session(1, "La Jolla, CA", "Irvine, CA", "January 16, 2024", "3:00pm"),
+            Session(2, "Cathedral City, CA", "La Quinta, CA", "February 26, 2024", "12:00pm"),
+            Session(1, "La Jolla, CA", "Irvine, CA", "January 16, 2024", "3:00pm"),
+            Session(2, "Cathedral City, CA", "La Quinta, CA", "February 26, 2024", "12:00pm"),
+            Session(1, "La Jolla, CA", "Irvine, CA", "January 16, 2024", "3:00pm"),
+            Session(2, "Cathedral City, CA", "La Quinta, CA", "February 26, 2024", "12:00pm"),
+            Session(1, "La Jolla, CA", "Irvine, CA", "January 16, 2024", "3:00pm"),
+            Session(2, "Cathedral City, CA", "La Quinta, CA", "February 26, 2024", "12:00pm"),
+            Session(1, "La Jolla, CA", "Irvine, CA", "January 16, 2024", "3:00pm"),
+            Session(2, "Cathedral City, CA", "La Quinta, CA", "February 26, 2024", "12:00pm"),
 //            Session(3, "Session 3", "This is the third session."),
 //            Session(1, "Session 1", "This is the first session."),
 //            Session(2, "Session 2", "This is the second session."),
