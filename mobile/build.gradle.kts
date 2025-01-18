@@ -41,6 +41,13 @@ android {
 
 dependencies {
 
+    val room_version = "2.6.1"
+
+    implementation("androidx.room:room-runtime:$room_version")
+
+    // If this project uses any Kotlin source, use Kotlin Symbol Processing (KSP)
+    // See Add the KSP plugin to your project
+
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.dafruits:webrtc:123.0.0")
