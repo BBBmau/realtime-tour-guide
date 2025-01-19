@@ -1,10 +1,18 @@
 package com.example.exploreai
 
+import android.app.Application
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import com.example.exploreai.databinding.ActivityTutorialBinding
 import android.os.Bundle
 import com.google.android.material.tabs.TabLayoutMediator
+
+class Application : Application() {
+    // Using by lazy so the database and the repository are only created when they're needed
+    // rather than when the application starts
+    val database by lazy { ConversationRoomDatabase.getDatabase(this) }
+    val repository by lazy { Repository(database.conversationDAO()) }
+}
 
 // TutorialActivity.kt
 class TutorialActivity : AppCompatActivity() {
