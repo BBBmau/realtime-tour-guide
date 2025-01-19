@@ -4,15 +4,16 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.exploreai.Conversation
 import com.example.exploreai.Repository
 import com.example.exploreai.webrtc.webRTCclient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.webrtc.PeerConnection
-import org.webrtc.SessionDescription
 import com.google.gson.Gson
+import kotlinx.coroutines.flow.Flow
 import java.nio.ByteBuffer
 import org.webrtc.DataChannel
 sealed class ApiResult<out T> {
@@ -21,15 +22,32 @@ sealed class ApiResult<out T> {
     object Loading : ApiResult<Nothing>()
 }
 
-class AssistantViewModel : ViewModel() {
-    private val repository = Repository()
+class AssistantViewModelFactory(private val repository: Repository) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(AssistantViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return AssistantViewModel(repository) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
+    }
+}
+
+
+class AssistantViewModel(private val repository: Repository) : ViewModel() {
     private val _data = MutableLiveData<ExploreAiEphemeralResp>()
     val resp: LiveData<ExploreAiEphemeralResp> = _data
     private val _sdpResponse = MutableLiveData<ApiResult<SessionBody>>()
     val sessionResp : LiveData<ApiResult<SessionBody>> = _sdpResponse
-
     private val _error = MutableLiveData<String>()
     val error: LiveData<String> = _error
+
+
+    val allWords: Flow<List<Conversation>> = repository.allConversations
+
+    fun insert(conversation:Conversation) = viewModelScope.launch {
+        repository.insert(conversation)
+    }
+
 
     fun fetch() {
         viewModelScope.launch {

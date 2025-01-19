@@ -28,7 +28,7 @@ dependencies {
     implementation 'com.google.android.material:material:1.9.0'
     // KTor - HTTP Client setup for WebSocket Connection
     implementation "io.ktor:ktor-client-android:1.6.4"
-
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:<latest_version>"
     // Optional - Coroutines support
     implementation ('org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1')
     implementation ('org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1')
