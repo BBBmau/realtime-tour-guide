@@ -43,10 +43,16 @@ public abstract class ConversationRoomDatabase : RoomDatabase() {
 }
 
 
-@Database(entities = [Conversation::class], version = 1)
-abstract class AppDatabase : RoomDatabase() {
+@Database(
+    entities = [
+        Conversation::class,
+        Message::class,
+    ],
+    version = 1,
+    exportSchema = false
+)abstract class AppDatabase : RoomDatabase() {
     abstract fun conversationDao(): ConversationDao
-    abstract fun messageDao(): MessagenDao
+    abstract fun messageDao(): MessageDao
 }
 
 @Dao
@@ -71,7 +77,7 @@ data class Conversation(
 )
 
 @Dao
-interface MessagenDao {
+interface MessageDao {
     @Query("SELECT * FROM message_table")
     fun getAll(): Flow<List<Message>>
 
@@ -82,7 +88,7 @@ interface MessagenDao {
 @Entity(tableName = "message_table")
 data class Message(
     @PrimaryKey val messageId: Int,
-    @ColumnInfo(name = "conversation_id") val conversationId: Conversation,
+    @ColumnInfo(name = "conversation_id") val conversationId: Int,
     @ColumnInfo(name = "timestamp") val time: String?,
     @ColumnInfo(name = "is_user") val start: Boolean,
     @ColumnInfo(name = "content") val content: String?,

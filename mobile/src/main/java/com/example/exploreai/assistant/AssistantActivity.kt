@@ -13,10 +13,15 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.exploreai.AssistantApplication
+import com.example.exploreai.ConversationDao
 import com.example.exploreai.R
+import com.example.exploreai.Repository
 import com.example.exploreai.settings.ToggleSettingsActivity
 import com.example.exploreai.databinding.ActivityAssistantBinding
 import com.example.exploreai.webrtc.webRTCclient
@@ -25,9 +30,10 @@ import org.webrtc.SessionDescription
 
 
 lateinit var EPHEMERAL_KEY: String
-val assistant = AssistantViewModel()
 
 class AssistantActivityActivity : AppCompatActivity() {
+
+    private lateinit var assistant: AssistantViewModel
 
     private lateinit var client : webRTCclient
     private  val audioPlayback = AudioPlayback()
@@ -51,6 +57,9 @@ class AssistantActivityActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        assistant = ViewModelProvider(this,
+            AssistantViewModelFactory((application as AssistantApplication).repository)
+        )[AssistantViewModel::class.java]
 
         client = webRTCclient(this, this)
 
