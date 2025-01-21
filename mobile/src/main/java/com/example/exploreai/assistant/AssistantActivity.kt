@@ -13,16 +13,13 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.exploreai.AssistantApplication
 import com.example.exploreai.Conversation
-import com.example.exploreai.ConversationDao
 import com.example.exploreai.R
-import com.example.exploreai.Repository
 import com.example.exploreai.settings.ToggleSettingsActivity
 import com.example.exploreai.databinding.ActivityAssistantBinding
 import com.example.exploreai.webrtc.webRTCclient
@@ -103,6 +100,16 @@ class AssistantActivityActivity : AppCompatActivity() {
         inSession = !inSession
         if (inSession) {
             messageAdapter.clearConversation()
+            if (messageAdapter.itemCount != 0) {
+                assistant.insertCoonversation(
+                    Conversation(
+                        date = "January 20, 2024",
+                        time = "8:00PM",
+                        start = "La Jolla, CA",
+                        destination = "Riverside, CA"
+                    )
+                )
+            }
             startRealtimeSession()
             microphoneIcon.startAnimation(pulseAnimation)
             statusText.text = "In conversation..."

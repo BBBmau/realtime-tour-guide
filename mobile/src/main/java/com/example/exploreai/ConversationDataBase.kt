@@ -69,7 +69,7 @@ interface ConversationDao {
 
 @Entity(tableName = "conversation_table")
 data class Conversation(
-    @PrimaryKey val conversationId: Int,
+    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "conversation_id") val conversationId: Int = 0,
     @ColumnInfo(name = "date") val date: String?,
     @ColumnInfo(name = "time") val time: String?,
     @ColumnInfo(name = "start") val start: String?,
