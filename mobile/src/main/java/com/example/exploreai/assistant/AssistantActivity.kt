@@ -101,6 +101,7 @@ class AssistantActivityActivity : AppCompatActivity() {
     private fun toggleSession() {
         inSession = !inSession
         if (inSession) {
+            messageAdapter.clearConversation()
             startRealtimeSession()
             microphoneIcon.startAnimation(pulseAnimation)
             statusText.text = "In conversation..."
