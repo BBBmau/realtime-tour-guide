@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.exploreai.Conversation
+import com.example.exploreai.ConversationMessage
 import com.example.exploreai.Repository
 import com.example.exploreai.webrtc.webRTCclient
 import kotlinx.coroutines.Dispatchers
@@ -44,8 +45,12 @@ class AssistantViewModel(private val repository: Repository) : ViewModel() {
 
     val allWords: Flow<List<Conversation>> = repository.allConversations
 
-    fun insert(conversation:Conversation) = viewModelScope.launch {
-        repository.insert(conversation)
+    fun insertCoonversation(conversation:Conversation) = viewModelScope.launch {
+        repository.insertConversation(conversation)
+    }
+
+    fun insertMessage(message: ConversationMessage) = viewModelScope.launch {
+        repository.insertMessage(message)
     }
 
 

@@ -6,11 +6,12 @@ import androidx.annotation.WorkerThread
 import com.example.exploreai.assistant.AssistantRequest
 import com.example.exploreai.assistant.AssistantResponse
 import com.example.exploreai.assistant.ExploreAiEphemeralResp
+import com.example.exploreai.assistant.Message
 import com.example.exploreai.assistant.SessionBody
 import kotlinx.coroutines.flow.Flow
 
 // Repository class to handle data operations
-class Repository(private val conversationDao: ConversationDao) {
+class Repository(private val conversationDao: ConversationDao, private val messageDao: MessageDao) {
 
 
     // Room executes all queries on a separate thread.
@@ -22,10 +23,15 @@ class Repository(private val conversationDao: ConversationDao) {
     // off the main thread.
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    suspend fun insert(conversation: Conversation) {
+    suspend fun insertConversation(conversation: Conversation) {
         conversationDao.insertConversation(conversation)
     }
 
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    suspend fun insertMessage(message: ConversationMessage) {
+        messageDao.insertMessage(message)
+    }
 
     // the fetch is for the ephemeral key
     suspend fun fetch(): ExploreAiEphemeralResp? {

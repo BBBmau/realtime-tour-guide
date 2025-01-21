@@ -19,6 +19,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.exploreai.AssistantApplication
+import com.example.exploreai.Conversation
 import com.example.exploreai.ConversationDao
 import com.example.exploreai.R
 import com.example.exploreai.Repository
