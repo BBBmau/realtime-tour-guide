@@ -25,6 +25,7 @@ import com.example.exploreai.databinding.ActivityAssistantBinding
 import com.example.exploreai.webrtc.webRTCclient
 import kotlinx.coroutines.launch
 import org.webrtc.SessionDescription
+import kotlin.properties.Delegates
 
 
 lateinit var EPHEMERAL_KEY: String
@@ -32,7 +33,7 @@ lateinit var EPHEMERAL_KEY: String
 class AssistantActivityActivity : AppCompatActivity() {
 
     private lateinit var assistant: AssistantViewModel
-
+    private var conversationID by Delegates.notNull<Int>()
     private lateinit var client : webRTCclient
     private  val audioPlayback = AudioPlayback()
     private lateinit var speechRecognitionManager: SpeechRecognitionManager
@@ -101,14 +102,14 @@ class AssistantActivityActivity : AppCompatActivity() {
         if (inSession) {
             messageAdapter.clearConversation()
             if (messageAdapter.itemCount != 0) {
-                assistant.insertCoonversation(
-                    Conversation(
-                        date = "January 20, 2024",
-                        time = "8:00PM",
-                        start = "La Jolla, CA",
-                        destination = "Riverside, CA"
-                    )
+                val newConversation = Conversation(
+                    date = "January 20, 2024",
+                    time = "8:00PM",
+                    start = "La Jolla, CA",
+                    destination = "Riverside, CA"
                 )
+                conversationID = newConversation.conversationId // we set in order to use later for messageDAO
+                assistant.insertConversation(newConversation)
             }
             startRealtimeSession()
             microphoneIcon.startAnimation(pulseAnimation)

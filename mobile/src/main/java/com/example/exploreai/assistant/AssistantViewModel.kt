@@ -45,7 +45,7 @@ class AssistantViewModel(private val repository: Repository) : ViewModel() {
 
     val allWords: Flow<List<Conversation>> = repository.allConversations
 
-    fun insertCoonversation(conversation:Conversation) = viewModelScope.launch {
+    fun insertConversation(conversation:Conversation) = viewModelScope.launch {
         repository.insertConversation(conversation)
     }
 
