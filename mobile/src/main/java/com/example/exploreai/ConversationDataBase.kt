@@ -14,10 +14,11 @@ import androidx.room.RoomDatabase
 import kotlinx.coroutines.flow.Flow
 
 // Annotates class to be a Room Database with a table (entity) of the Conversation class
-@Database(entities = arrayOf(Conversation::class), version = 1, exportSchema = false)
+@Database(entities = arrayOf(Conversation::class, ConversationMessage::class), version = 1, exportSchema = false)
 public abstract class ConversationRoomDatabase : RoomDatabase() {
 
     abstract fun conversationDAO(): ConversationDao
+    abstract fun messageDAO(): MessageDao
 
     companion object {
         // Singleton prevents multiple instances of database opening at the
@@ -61,7 +62,7 @@ interface ConversationDao {
     fun getAll(): Flow<List<Conversation>>
 
     @Insert
-    fun insertConversation(conversation: Conversation)
+    suspend fun insertConversation(conversation: Conversation)
 
     @Delete
     fun delete(conversation: Conversation)

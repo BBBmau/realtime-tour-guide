@@ -10,54 +10,59 @@ import android.widget.ListView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.exploreai.Conversation
 import com.example.exploreai.R
+import com.example.exploreai.assistant.assistant
 import com.google.android.material.appbar.MaterialToolbar
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-data class Session(
-    val id: Int,
-    val start: String,
-    val destination: String,
-    val date: String,
-    val time: String,
-)
+class ConversationAdapter(
+    private val conversations: List<Conversation>,
+    private val onItemClick: (Conversation) -> Unit // Lambda for click handling
+) : RecyclerView.Adapter<ConversationAdapter.ConversationViewHolder>() {
 
-class SessionAdapter(
-    private val sessions: List<Session>,
-    private val onItemClick: (Session) -> Unit // Lambda for click handling
-) : RecyclerView.Adapter<SessionAdapter.SessionViewHolder>() {
-
-    class SessionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class ConversationViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val startTextView: TextView = itemView.findViewById(R.id.sessionStartTextView)
         val destinationTextView: TextView = itemView.findViewById(R.id.sessionDestinationTextView)
         val sessionDateTextView: TextView = itemView.findViewById(R.id.sessionDateTextView)
         val sessionTimeTextView: TextView = itemView.findViewById(R.id.sessionTimeTextView)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SessionViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ConversationViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_session, parent, false)
-        return SessionViewHolder(view)
+        return ConversationViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: SessionViewHolder, position: Int) {
-        val session = sessions[position]
-        holder.startTextView.text = session.start
-        holder.destinationTextView.text = session.destination
-        holder.sessionDateTextView.text = session.date
-        holder.sessionTimeTextView.text = session.time
+    override fun onBindViewHolder(holder: ConversationViewHolder, position: Int) {
+        val conversation = conversations[position]
+        holder.startTextView.text = conversation.start
+        holder.destinationTextView.text = conversation.destination
+        holder.sessionDateTextView.text = conversation.date
+        holder.sessionTimeTextView.text = conversation.time
 
         // Set click listener for the entire item view
         holder.itemView.setOnClickListener {
-            onItemClick(session) // Pass the clicked session to the lambda
+            onItemClick(conversation) // Pass the clicked session to the lambda
         }
     }
 
     override fun getItemCount(): Int {
-        return sessions.size
+        return conversations.size
     }
 }
 
+suspend fun <T> Flow<List<T>>.flattenToList(): List<T> {
+    return flatMapConcat { it.asFlow() }.toList()
+}
 
 
 class ConversationHistoryListActivity : AppCompatActivity() {
@@ -66,50 +71,25 @@ class ConversationHistoryListActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_conversation_history)
         val recyclerList = findViewById<RecyclerView>(R.id.conversationListView)
-        // Sample data for sessions
-        val sessions = listOf(
-            Session(1, "La Jolla, CA", "Irvine, CA", "January 16, 2024", "3:00pm"),
-            Session(2, "Cathedral City, CA", "La Quinta, CA", "February 26, 2024", "12:00pm"),
-            Session(1, "La Jolla, CA", "Irvine, CA", "January 16, 2024", "3:00pm"),
-            Session(2, "Cathedral City, CA", "La Quinta, CA", "February 26, 2024", "12:00pm"),
-            Session(1, "La Jolla, CA", "Irvine, CA", "January 16, 2024", "3:00pm"),
-            Session(2, "Cathedral City, CA", "La Quinta, CA", "February 26, 2024", "12:00pm"),
-            Session(1, "La Jolla, CA", "Irvine, CA", "January 16, 2024", "3:00pm"),
-            Session(2, "Cathedral City, CA", "La Quinta, CA", "February 26, 2024", "12:00pm"),
-            Session(1, "La Jolla, CA", "Irvine, CA", "January 16, 2024", "3:00pm"),
-            Session(2, "Cathedral City, CA", "La Quinta, CA", "February 26, 2024", "12:00pm"),
-            Session(1, "La Jolla, CA", "Irvine, CA", "January 16, 2024", "3:00pm"),
-            Session(2, "Cathedral City, CA", "La Quinta, CA", "February 26, 2024", "12:00pm"),
-            Session(1, "La Jolla, CA", "Irvine, CA", "January 16, 2024", "3:00pm"),
-            Session(2, "Cathedral City, CA", "La Quinta, CA", "February 26, 2024", "12:00pm"),
-            Session(1, "La Jolla, CA", "Irvine, CA", "January 16, 2024", "3:00pm"),
-            Session(2, "Cathedral City, CA", "La Quinta, CA", "February 26, 2024", "12:00pm"),
-            Session(1, "La Jolla, CA", "Irvine, CA", "January 16, 2024", "3:00pm"),
-            Session(2, "Cathedral City, CA", "La Quinta, CA", "February 26, 2024", "12:00pm"),
-            Session(1, "La Jolla, CA", "Irvine, CA", "January 16, 2024", "3:00pm"),
-            Session(2, "Cathedral City, CA", "La Quinta, CA", "February 26, 2024", "12:00pm"),
-//            Session(3, "Session 3", "This is the third session."),
-//            Session(1, "Session 1", "This is the first session."),
-//            Session(2, "Session 2", "This is the second session."),
-//            Session(3, "Session 3", "This is the third session."),
-//            Session(1, "Session 1", "This is the first session."),
-//            Session(2, "Session 2", "This is the second session."),
-//            Session(3, "Session 3", "This is the third session.")
-        )
+        val ctx = this
+        lifecycleScope.launch(Dispatchers.IO) {
+            val conversations = assistant.allConversations // Call your suspending function
+            // Switch back to the main thread to update UI or continue execution
+            withContext(Dispatchers.Main) {
+                // Use the result (sessions) here
+                // Create adapter with a click listener
+                val adapter = ConversationAdapter(conversations.flattenToList()) { selectedConversation ->
+                    // Handle item click here
 
-// Create adapter with a click listener
-        val adapter = SessionAdapter(sessions) { selectedSession ->
-            // Handle item click here
-            Toast.makeText(this, "Clicked on ${selectedSession.start} -> ${selectedSession.destination}", Toast.LENGTH_SHORT).show()
-
-            // Example: Navigate to another activity
-            // val intent = Intent(this, SessionDetailActivity::class.java)
-            // intent.putExtra("session_id", selectedSession.id)
-            // startActivity(intent)
+                    // Example: Navigate to another activity
+                    // val intent = Intent(this, SessionDetailActivity::class.java)
+                    // intent.putExtra("session_id", selectedSession.id)
+                    // startActivity(intent)
+                }
+                recyclerList.layoutManager = LinearLayoutManager(ctx)
+                recyclerList.adapter = adapter
+            }
         }
-
-        recyclerList.layoutManager = LinearLayoutManager(this)
-        recyclerList.adapter = adapter
 
 // Set up back navigation in toolbar
         findViewById<MaterialToolbar>(R.id.topAppBar).setNavigationOnClickListener {

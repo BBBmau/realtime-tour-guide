@@ -43,7 +43,7 @@ class AssistantViewModel(private val repository: Repository) : ViewModel() {
     val error: LiveData<String> = _error
 
 
-    val allWords: Flow<List<Conversation>> = repository.allConversations
+    val allConversations: Flow<List<Conversation>> = repository.allConversations
 
     fun insertConversation(conversation:Conversation) = viewModelScope.launch {
         repository.insertConversation(conversation)
