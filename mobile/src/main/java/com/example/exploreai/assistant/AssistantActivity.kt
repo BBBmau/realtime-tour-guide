@@ -19,6 +19,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.exploreai.AssistantApplication
 import com.example.exploreai.Conversation
+import com.example.exploreai.ConversationMessage
+import com.example.exploreai.MessageDao
 import com.example.exploreai.R
 import com.example.exploreai.settings.ToggleSettingsActivity
 import com.example.exploreai.databinding.ActivityAssistantBinding
@@ -118,12 +120,17 @@ class AssistantActivityActivity : AppCompatActivity() {
             statusText.setTextColor(getColor(R.color.primary))
             //TODO: have ui update in real-time while user is speaking
         } else {
+            addMessagesToConversation()
             client.pc.close()
             microphoneIcon.clearAnimation()
             statusText.text = "Idle"
             microphoneIcon.setColorFilter(getColor(androidx.appcompat.R.color.abc_background_cache_hint_selector_material_dark))
             statusText.setTextColor(getColor(R.color.secondary))
         }
+    }
+
+    private fun addMessagesToConversation(){
+        messageAdapter.getAllMessages().forEach{ msg -> assistant.insertMessage(ConversationMessage(  conversationId = conversationID, time = "${msg.timestamp}", isUser = msg.isFromUser, content = msg.text))}
     }
 
     private lateinit var binding: ActivityAssistantBinding

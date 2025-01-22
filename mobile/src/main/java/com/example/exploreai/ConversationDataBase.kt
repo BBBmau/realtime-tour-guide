@@ -87,9 +87,9 @@ interface MessageDao {
 
 @Entity(tableName = "message_table")
 data class ConversationMessage(
-    @PrimaryKey val messageId: Int,
+    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "message_id") val messageId: Int = 0,
     @ColumnInfo(name = "conversation_id") val conversationId: Int,
     @ColumnInfo(name = "timestamp") val time: String?,
-    @ColumnInfo(name = "is_user") val start: Boolean,
+    @ColumnInfo(name = "is_user") val isUser: Boolean,
     @ColumnInfo(name = "content") val content: String?,
     )

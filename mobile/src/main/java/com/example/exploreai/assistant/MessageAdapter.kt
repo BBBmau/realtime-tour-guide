@@ -65,6 +65,10 @@ class MessageAdapter : RecyclerView.Adapter<MessageAdapter.MessageViewHolder>() 
         notifyItemInserted(messages.size - 1)
     }
 
+    fun getAllMessages(): MutableList<Message>{
+        return messages
+    }
+
     fun clearConversation(){
         messages.clear()
     }
