@@ -38,7 +38,6 @@ class AssistantActivityActivity : AppCompatActivity() {
     private var conversationID by Delegates.notNull<Int>()
     private lateinit var client : webRTCclient
     private  val audioPlayback = AudioPlayback()
-    private lateinit var speechRecognitionManager: SpeechRecognitionManager
     private lateinit var microphoneIcon: ImageView
     private lateinit var statusText: TextView
     private lateinit var pulseAnimation: Animation
@@ -183,7 +182,6 @@ class AssistantActivityActivity : AppCompatActivity() {
                 Manifest.permission.RECORD_AUDIO,
             ) == PackageManager.PERMISSION_GRANTED -> {
                 Log.d("Assistant", "Assistant received permissions to listen")
-                speechRecognitionManager = SpeechRecognitionManager(this)
             }
             else -> {
                 requestPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
