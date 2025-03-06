@@ -1,6 +1,7 @@
 package com.example.exploreai.settings
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -92,7 +93,10 @@ class ConversationHistoryListActivity : AppCompatActivity() {
                             // Handle item click here
                             Toast.makeText(ctx, "Selected: ${selectedConversation.start} to ${selectedConversation.destination}",
                                 Toast.LENGTH_SHORT).show()
-                            
+
+                                startActivity(Intent(ctx, ConversationMessageHistory::class.java))
+
+                            selectedConversation.conversationId
                             // Example: Navigate to another activity with the conversation
                             // val intent = Intent(ctx, ConversationDetailActivity::class.java)
                             // intent.putExtra("conversation_id", selectedConversation.id)

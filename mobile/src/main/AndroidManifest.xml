@@ -34,6 +34,10 @@
             android:exported="false" />
 
         <activity
+            android:name=".settings.ConversationMessageHistory"
+            android:exported="false" />
+
+        <activity
             android:name=".settings.ToggleSettingsActivity"
             android:exported="false" />
 

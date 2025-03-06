@@ -10,10 +10,10 @@
         layout="@layout/assistant_message_history_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@+id/settingsButtonContainer" />
-
+        app:layout_constraintBottom_toTopOf="@+id/ButtonContainer" />
+    <!-- TODO: include more options of what to do in a conversation in the future (maybe share over a link?)-->
     <LinearLayout
-        android:id="@+id/settingsButtonContainer"
+        android:id="@+id/ButtonContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -21,7 +21,7 @@
         app:layout_constraintBottom_toBottomOf="parent">
 
         <Button
-            android:id="@+id/settingsButton"
+            android:id="@+id/backButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
