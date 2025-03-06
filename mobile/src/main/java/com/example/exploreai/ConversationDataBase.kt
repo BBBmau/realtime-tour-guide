@@ -14,7 +14,7 @@ import androidx.room.RoomDatabase
 import kotlinx.coroutines.flow.Flow
 
 // Annotates class to be a Room Database with a table (entity) of the Conversation class
-@Database(entities = [Conversation::class, ConversationMessage::class], version = 1, exportSchema = false)
+@Database(entities = [Conversation::class, ConversationMessage::class], version = 2, exportSchema = false)
 public abstract class ConversationRoomDatabase : RoomDatabase() {
 
     abstract fun conversationDAO(): ConversationDao
@@ -34,7 +34,7 @@ public abstract class ConversationRoomDatabase : RoomDatabase() {
                     context.applicationContext,
                     ConversationRoomDatabase::class.java,
                     "conversation_database"
-                ).build()
+                ).fallbackToDestructiveMigration().build() // TODO: look into migration of database
                 INSTANCE = instance
                 // return instance
                 instance
@@ -78,6 +78,6 @@ data class ConversationMessage(
     @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "message_id") val messageId: Int = 0,
     @ColumnInfo(name = "conversation_id") val conversationId: Long,
     @ColumnInfo(name = "timestamp") val time: String?,
-    @ColumnInfo(name = "is_user") val isUser: Boolean,
-    @ColumnInfo(name = "content") val content: String?,
+    @ColumnInfo(name = "is_user") val isFromUser: Boolean,
+    @ColumnInfo(name = "text") val text: String?,
     )

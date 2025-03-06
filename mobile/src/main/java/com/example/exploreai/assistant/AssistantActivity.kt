@@ -143,8 +143,8 @@ class AssistantActivityActivity : AppCompatActivity() {
                         assistant.insertMessage(ConversationMessage(
                             conversationId = conversationID, 
                             time = "${msg.timestamp}", 
-                            isUser = msg.isFromUser, 
-                            content = msg.text
+                            isFromUser = msg.isFromUser,
+                            text = msg.text
                         ))
                     }
                 }

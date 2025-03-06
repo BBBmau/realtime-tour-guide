@@ -10,28 +10,25 @@ import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.exploreai.ConversationMessage
 import com.example.exploreai.R
 
-data class Message(
-    val text: String,
-    val isFromUser: Boolean = false,
-    val timestamp: Long = System.currentTimeMillis()
-)
-
-class MessageAdapter(initialMessages: List<Message> = emptyList()) : RecyclerView.Adapter<MessageAdapter.MessageViewHolder>() {
+//TODO: we shouldn't need to separate messageAdapters, ideally one should handle both real-time and history messages.
+class ConversationMessageAdapter(initialMessages: List<ConversationMessage>) : RecyclerView.Adapter<ConversationMessageAdapter.ConversationMessageViewHolder>() {
     private val messages = initialMessages.toMutableList()
 
-    class MessageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class ConversationMessageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val messageText: TextView = itemView.findViewById(R.id.messageText)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ConversationMessageViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.message_item, parent, false)
-        return MessageViewHolder(view)
+        return ConversationMessageViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: MessageViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ConversationMessageViewHolder, position: Int) {
+        Log.d("[conversationMessageAdapter]", "messages size: ${messages.size}")
         val message = messages[position]
         holder.messageText.text = message.text
 
@@ -60,16 +57,8 @@ class MessageAdapter(initialMessages: List<Message> = emptyList()) : RecyclerVie
 
     override fun getItemCount() = messages.size
 
-    fun addMessage(message: Message) {
-        messages.add(message)
-        notifyItemInserted(messages.size - 1)
-    }
 
-    fun getAllMessages(): MutableList<Message>{
+    fun getAllMessages(): MutableList<ConversationMessage>{
         return messages
-    }
-
-    fun clearConversation(){
-        messages.clear()
     }
 }

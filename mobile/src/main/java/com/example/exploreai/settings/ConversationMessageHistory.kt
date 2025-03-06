@@ -11,6 +11,8 @@ import com.example.exploreai.AssistantApplication
 import com.example.exploreai.Repository
 import com.example.exploreai.assistant.AssistantViewModel
 import com.example.exploreai.assistant.AssistantViewModelFactory
+import com.example.exploreai.assistant.ConversationMessageAdapter
+import com.example.exploreai.assistant.MessageAdapter
 import com.example.exploreai.databinding.ActivityConversationMessagesBinding
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -35,7 +37,6 @@ class ConversationMessageHistory : AppCompatActivity() {
         if (conversationId == -1) {
             // Handle error - no valid conversation ID
             finish()
-            return
         }
 
         // Load messages for this conversation
@@ -45,10 +46,15 @@ class ConversationMessageHistory : AppCompatActivity() {
 
     private fun loadMessagesForConversation(conversationId: Int) {
         lifecycleScope.launch {
+            Log.d("[messageHistory]", "conversationID: $conversationId")
             viewModel.getMessagesForConversation(conversationId).collectLatest { messages ->
                 // Update your UI with the messages
                 // For example, set up a RecyclerView adapter with the messages
-                // binding.messagesRecyclerView.adapter = MessageAdapter(messages)
+                Log.d("[messageHistory]", "messageCount: ${messages.size}")
+                binding.assistantMessagesHistory.messageList.apply {
+                    layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this@ConversationMessageHistory)
+                    adapter = ConversationMessageAdapter(messages)
+                }
             }
         }
     }
