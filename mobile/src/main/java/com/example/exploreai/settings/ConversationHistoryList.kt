@@ -72,22 +72,41 @@ class ConversationHistoryListActivity : AppCompatActivity() {
         setContentView(R.layout.activity_conversation_history)
         val recyclerList = findViewById<RecyclerView>(R.id.conversationListView)
         val ctx = this
-        lifecycleScope.launch(Dispatchers.IO) {
-            val conversations = assistant.allConversations // Call your suspending function
-            // Switch back to the main thread to update UI or continue execution
-            withContext(Dispatchers.Main) {
-                // Use the result (sessions) here
-                // Create adapter with a click listener
-                val adapter = ConversationAdapter(conversations.flattenToList()) { selectedConversation ->
-                    // Handle item click here
-
-                    // Example: Navigate to another activity
-                    // val intent = Intent(this, SessionDetailActivity::class.java)
-                    // intent.putExtra("session_id", selectedSession.id)
-                    // startActivity(intent)
+        recyclerList.layoutManager = LinearLayoutManager(ctx)
+        
+        // Add this to show a loading indicator or message
+        Toast.makeText(this, "Loading conversations...", Toast.LENGTH_SHORT).show()
+        
+        lifecycleScope.launch {
+            try {
+                val conversationsFlow = assistant.allConversations
+                
+                // Collect the flow and update UI when data arrives
+                conversationsFlow.collect { conversationsList ->
+                    if (conversationsList.isEmpty()) {
+                        // Handle empty list case
+                        Toast.makeText(ctx, "No conversations found", Toast.LENGTH_SHORT).show()
+                    } else {
+                        // Create and set adapter with conversations
+                        val adapter = ConversationAdapter(conversationsList) { selectedConversation ->
+                            // Handle item click here
+                            Toast.makeText(ctx, "Selected: ${selectedConversation.start} to ${selectedConversation.destination}",
+                                Toast.LENGTH_SHORT).show()
+                            
+                            // Example: Navigate to another activity with the conversation
+                            // val intent = Intent(ctx, ConversationDetailActivity::class.java)
+                            // intent.putExtra("conversation_id", selectedConversation.id)
+                            // startActivity(intent)
+                        }
+                        recyclerList.adapter = adapter
+                    }
                 }
-                recyclerList.layoutManager = LinearLayoutManager(ctx)
-                recyclerList.adapter = adapter
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    // Display error message
+                    Toast.makeText(ctx, "Error loading conversations: ${e.message}", Toast.LENGTH_LONG).show()
+                    e.printStackTrace()
+                }
             }
         }
 
