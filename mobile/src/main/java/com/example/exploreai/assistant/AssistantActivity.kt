@@ -40,7 +40,7 @@ lateinit var EPHEMERAL_KEY: String
 
 class AssistantActivityActivity : AppCompatActivity() {
 
-    private var conversationID by Delegates.notNull<Int>()
+    private var conversationID: Int = -1
     private lateinit var client : webRTCclient
     private  val audioPlayback = AudioPlayback()
     private lateinit var microphoneIcon: ImageView
@@ -106,6 +106,7 @@ class AssistantActivityActivity : AppCompatActivity() {
     private fun toggleSession() {
         inSession = !inSession
         if (inSession) {
+            Log.d("[toggleSession]", "Session in Progress")
             if (messageAdapter.itemCount != 0) {
                 val newConversation = Conversation(
                     date = "January 20, 2024",
@@ -113,15 +114,15 @@ class AssistantActivityActivity : AppCompatActivity() {
                     start = "La Jolla, CA",
                     destination = "Riverside, CA"
                 )
-                conversationID = newConversation.conversationId // we set in order to use later for messageDAO
                 lifecycleScope.launch {
                 // Insert conversation in a background thread
-                withContext(Dispatchers.IO) {
-                    assistant.insertConversation(newConversation)
+                    withContext(Dispatchers.IO) {
+                        Log.d("[toggleSession]","newConversation inserted: ${newConversation.conversationId}")
+                        assistant.insertConversation(newConversation)
+                        conversationID = newConversation.conversationId // we set in order to use later for messageDAO
+                    }
                 }
             }
-
-        }
             messageAdapter.clearConversation()
             startRealtimeSession()
             microphoneIcon.startAnimation(pulseAnimation)
@@ -130,7 +131,7 @@ class AssistantActivityActivity : AppCompatActivity() {
             statusText.setTextColor(getColor(R.color.primary))
             //TODO: have ui update in real-time while user is speaking
         } else {
-//            addMessagesToConversation()
+            addMessagesToConversation()
             client.pc.close()
             microphoneIcon.clearAnimation()
             statusText.text = "Idle"
@@ -140,7 +141,22 @@ class AssistantActivityActivity : AppCompatActivity() {
     }
 
     private fun addMessagesToConversation(){
-        messageAdapter.getAllMessages().forEach{ msg -> assistant.insertMessage(ConversationMessage(  conversationId = conversationID, time = "${msg.timestamp}", isUser = msg.isFromUser, content = msg.text))}
+        if (messageAdapter.itemCount != 0 && conversationID > 0){  // Check that conversationID is valid
+            lifecycleScope.launch {
+                withContext(Dispatchers.IO) {
+                    messageAdapter.getAllMessages().forEach{ msg -> 
+                        assistant.insertMessage(ConversationMessage(
+                            conversationId = conversationID, 
+                            time = "${msg.timestamp}", 
+                            isUser = msg.isFromUser, 
+                            content = msg.text
+                        ))
+                    }
+                }
+            }
+        } else {
+            Log.w("[addMessagesToConversation]", "No messages to add or invalid conversationID: $conversationID")
+        }
     }
 
     private lateinit var binding: ActivityAssistantBinding

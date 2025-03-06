@@ -14,7 +14,7 @@ import androidx.room.RoomDatabase
 import kotlinx.coroutines.flow.Flow
 
 // Annotates class to be a Room Database with a table (entity) of the Conversation class
-@Database(entities = arrayOf(Conversation::class, ConversationMessage::class), version = 1, exportSchema = false)
+@Database(entities = [Conversation::class, ConversationMessage::class], version = 1, exportSchema = false)
 public abstract class ConversationRoomDatabase : RoomDatabase() {
 
     abstract fun conversationDAO(): ConversationDao
@@ -41,19 +41,6 @@ public abstract class ConversationRoomDatabase : RoomDatabase() {
             }
         }
     }
-}
-
-
-@Database(
-    entities = [
-        Conversation::class,
-        ConversationMessage::class,
-    ],
-    version = 1,
-    exportSchema = false
-)abstract class AppDatabase : RoomDatabase() {
-    abstract fun conversationDao(): ConversationDao
-    abstract fun messageDao(): MessageDao
 }
 
 @Dao
@@ -83,7 +70,7 @@ interface MessageDao {
     fun getAll(): Flow<List<ConversationMessage>>
 
     @Insert
-    fun insertMessage(message: ConversationMessage)
+    suspend fun insertMessage(message: ConversationMessage)
 }
 
 @Entity(tableName = "message_table")
