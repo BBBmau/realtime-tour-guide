@@ -1,6 +1,5 @@
 package com.example.exploreai
 
-import android.companion.AssociatedDevice
 import android.util.Log
 import androidx.annotation.WorkerThread
 import com.example.exploreai.assistant.AssistantRequest
@@ -17,7 +16,10 @@ class Repository(private val conversationDao: ConversationDao, private val messa
     // Room executes all queries on a separate thread.
     // Observed Flow will notify the observer when the data has changed.
     val allConversations: Flow<List<Conversation>> = conversationDao.getAll()
-//    val allMessages: Flow<List<ConversationMessage>> = messageDao.getAll()
+
+    fun getMessagesForConversation(conversationId: Int): Flow<List<ConversationMessage>> {
+        return messageDao.getMessagesForConversation(conversationId)
+    }
 
     // By default Room runs suspend queries off the main thread, therefore, we don't need to
     // implement anything else to ensure we're not doing long running database work

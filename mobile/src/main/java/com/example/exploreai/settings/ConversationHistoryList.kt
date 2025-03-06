@@ -91,12 +91,11 @@ class ConversationHistoryListActivity : AppCompatActivity() {
                         // Create and set adapter with conversations
                         val adapter = ConversationAdapter(conversationsList) { selectedConversation ->
                             // Handle item click here
-                            Toast.makeText(ctx, "Selected: ${selectedConversation.start} to ${selectedConversation.destination}",
+                            Toast.makeText(ctx, "Selected: ${selectedConversation.conversationId}",
                                 Toast.LENGTH_SHORT).show()
-
-                                startActivity(Intent(ctx, ConversationMessageHistory::class.java))
-
-                            selectedConversation.conversationId
+                            var conversationIntent = Intent(ctx, ConversationMessageHistory::class.java)
+                            conversationIntent.putExtra("conversation_id", selectedConversation.conversationId)
+                            startActivity(conversationIntent)
                             // Example: Navigate to another activity with the conversation
                             // val intent = Intent(ctx, ConversationDetailActivity::class.java)
                             // intent.putExtra("conversation_id", selectedConversation.id)

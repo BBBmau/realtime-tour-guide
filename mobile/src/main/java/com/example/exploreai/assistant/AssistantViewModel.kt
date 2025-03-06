@@ -45,6 +45,12 @@ class AssistantViewModel(private val repository: Repository) : ViewModel() {
 
 
     val allConversations: Flow<List<Conversation>> = repository.allConversations
+    
+    // Add this new method to get messages for a specific conversation
+    fun getMessagesForConversation(conversationId: Int): Flow<List<ConversationMessage>> {
+        return repository.getMessagesForConversation(conversationId)
+    }
+
     suspend fun insertConversation(conversation: Conversation): Long {
         return withContext(Dispatchers.IO) { 
             repository.insertConversation(conversation)
