@@ -20,15 +20,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.exploreai.AssistantApplication
 import com.example.exploreai.Conversation
 import com.example.exploreai.ConversationMessage
-import com.example.exploreai.MessageDao
 import com.example.exploreai.R
 import com.example.exploreai.settings.ToggleSettingsActivity
 import com.example.exploreai.databinding.ActivityAssistantBinding
-import com.example.exploreai.settings.flattenToList
 import com.example.exploreai.webrtc.webRTCclient
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.count
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.webrtc.SessionDescription
@@ -40,7 +36,7 @@ lateinit var EPHEMERAL_KEY: String
 
 class AssistantActivityActivity : AppCompatActivity() {
 
-    private var conversationID: Int = -1
+    var conversationID by Delegates.notNull<Long>()
     private lateinit var client : webRTCclient
     private  val audioPlayback = AudioPlayback()
     private lateinit var microphoneIcon: ImageView
@@ -106,8 +102,8 @@ class AssistantActivityActivity : AppCompatActivity() {
     private fun toggleSession() {
         inSession = !inSession
         if (inSession) {
+            messageAdapter.clearConversation() // clear the previous conversation
             Log.d("[toggleSession]", "Session in Progress")
-            if (messageAdapter.itemCount != 0) {
                 val newConversation = Conversation(
                     date = "January 20, 2024",
                     time = "8:00PM",
@@ -115,15 +111,14 @@ class AssistantActivityActivity : AppCompatActivity() {
                     destination = "Riverside, CA"
                 )
                 lifecycleScope.launch {
-                // Insert conversation in a background thread
+                    // Insert conversation in a background thread
                     withContext(Dispatchers.IO) {
-                        Log.d("[toggleSession]","newConversation inserted: ${newConversation.conversationId}")
-                        assistant.insertConversation(newConversation)
-                        conversationID = newConversation.conversationId // we set in order to use later for messageDAO
+                        // Insert the conversation and get the ID
+                        conversationID = assistant.insertConversation(newConversation)
+                        
+                        Log.d("[toggleSession]", "newConversation inserted with ID: $conversationID")
                     }
-                }
             }
-            messageAdapter.clearConversation()
             startRealtimeSession()
             microphoneIcon.startAnimation(pulseAnimation)
             statusText.text = "In conversation..."

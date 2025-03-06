@@ -15,6 +15,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import com.google.gson.Gson
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.last
 import java.nio.ByteBuffer
 import org.webrtc.DataChannel
 sealed class ApiResult<out T> {
@@ -44,13 +45,16 @@ class AssistantViewModel(private val repository: Repository) : ViewModel() {
 
 
     val allConversations: Flow<List<Conversation>> = repository.allConversations
-
-    fun insertConversation(conversation:Conversation) = viewModelScope.launch {
-        repository.insertConversation(conversation)
+    suspend fun insertConversation(conversation: Conversation): Long {
+        return withContext(Dispatchers.IO) { 
+            repository.insertConversation(conversation)
+        }
     }
 
-    fun insertMessage(message: ConversationMessage) = viewModelScope.launch {
-        repository.insertMessage(message)
+    suspend fun insertMessage(message: ConversationMessage): Long {
+        return withContext(Dispatchers.IO) {
+            repository.insertMessage(message)
+        }
     }
 
 

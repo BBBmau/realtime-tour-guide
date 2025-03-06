@@ -17,21 +17,21 @@ class Repository(private val conversationDao: ConversationDao, private val messa
     // Room executes all queries on a separate thread.
     // Observed Flow will notify the observer when the data has changed.
     val allConversations: Flow<List<Conversation>> = conversationDao.getAll()
-    val allMessages: Flow<List<ConversationMessage>> = messageDao.getAll()
+//    val allMessages: Flow<List<ConversationMessage>> = messageDao.getAll()
 
     // By default Room runs suspend queries off the main thread, therefore, we don't need to
     // implement anything else to ensure we're not doing long running database work
     // off the main thread.
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    suspend fun insertConversation(conversation: Conversation) {
-        conversationDao.insertConversation(conversation)
+    suspend fun insertConversation(conversation: Conversation): Long {
+        return conversationDao.insertConversation(conversation)
     }
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    suspend fun insertMessage(message: ConversationMessage) {
-        messageDao.insertMessage(message)
+    suspend fun insertMessage(message: ConversationMessage): Long {
+        return messageDao.insertMessage(message)
     }
 
     // the fetch is for the ephemeral key

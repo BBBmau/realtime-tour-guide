@@ -49,7 +49,7 @@ interface ConversationDao {
     fun getAll(): Flow<List<Conversation>>
 
     @Insert
-    suspend fun insertConversation(conversation: Conversation)
+    fun insertConversation(conversation: Conversation): Long
 
     @Delete
     fun delete(conversation: Conversation)
@@ -66,17 +66,17 @@ data class Conversation(
 
 @Dao
 interface MessageDao {
-    @Query("SELECT * FROM message_table")
-    fun getAll(): Flow<List<ConversationMessage>>
-
+    @Query("SELECT * FROM message_table WHERE conversation_id = :conversationId ORDER BY timestamp ASC")
+    fun getMessagesForConversation(conversationId: Int): Flow<List<ConversationMessage>>
+    
     @Insert
-    suspend fun insertMessage(message: ConversationMessage)
+    fun insertMessage(message: ConversationMessage): Long
 }
 
 @Entity(tableName = "message_table")
 data class ConversationMessage(
     @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "message_id") val messageId: Int = 0,
-    @ColumnInfo(name = "conversation_id") val conversationId: Int,
+    @ColumnInfo(name = "conversation_id") val conversationId: Long,
     @ColumnInfo(name = "timestamp") val time: String?,
     @ColumnInfo(name = "is_user") val isUser: Boolean,
     @ColumnInfo(name = "content") val content: String?,
