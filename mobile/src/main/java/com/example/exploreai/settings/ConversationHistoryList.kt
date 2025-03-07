@@ -89,7 +89,7 @@ class ConversationHistoryListActivity : AppCompatActivity() {
                         Toast.makeText(ctx, "No conversations found", Toast.LENGTH_SHORT).show()
                     } else {
                         // Create and set adapter with conversations
-                        val adapter = ConversationAdapter(conversationsList) { selectedConversation ->
+                        val adapter = ConversationAdapter(conversationsList.reversed()) { selectedConversation ->
                             // Handle item click here
                             Toast.makeText(ctx, "Selected: ${selectedConversation.conversationId}",
                                 Toast.LENGTH_SHORT).show()
