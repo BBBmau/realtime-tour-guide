@@ -47,13 +47,13 @@ object LocationTimeUtils {
                             location.latitude, location.longitude, 1
                         ) ?: emptyList()
                         
-                        val cityName = if (addresses.isNotEmpty()) {
-                            addresses[0].locality ?: "Unknown Location"
+                        val location = if (addresses.isNotEmpty()) {
+                            (addresses[0].locality + ", " + addresses[0].countryName)
                         } else {
                             "Unknown Location"
                         }
                         
-                        callback(formattedDate, formattedTime, cityName)
+                        callback(formattedDate, formattedTime, location)
                     } catch (e: Exception) {
                         e.printStackTrace()
                         callback(formattedDate, formattedTime, "Location Error")
