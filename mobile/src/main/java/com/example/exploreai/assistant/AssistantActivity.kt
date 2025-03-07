@@ -104,33 +104,12 @@ class AssistantActivityActivity : AppCompatActivity() {
         }
 
     }
-    val ctx = this
+
     private fun toggleSession() {
         inSession = !inSession
         if (inSession) {
             messageAdapter.clearConversation() // clear the previous conversation
             Log.d("[toggleSession]", "Session in Progress")
-            
-            LocationTimeUtils.getCurrentDateTimeLocation(this) { date, time, location ->
-                Log.d("[toggleSession]", "Location: $location")
-                val newConversation = Conversation(
-                    date = date,
-                    time = time,
-                    start = location,
-                    destination = "Unknown" // You'll need to determine destination separately
-                )
-                
-                lifecycleScope.launch {
-                    // Insert conversation in a background thread
-                    withContext(Dispatchers.IO) {
-                        // Insert the conversation and get the ID
-                        conversationID = assistant.insertConversation(newConversation).toInt()
-                        
-                        Log.d("[toggleSession]", "newConversation inserted with ID: $conversationID")
-                    }
-                }
-            }
-            
             startRealtimeSession()
             microphoneIcon.startAnimation(pulseAnimation)
             statusText.text = "In conversation..."
@@ -138,13 +117,38 @@ class AssistantActivityActivity : AppCompatActivity() {
             statusText.setTextColor(getColor(R.color.primary))
             //TODO: have ui update in real-time while user is speaking
         } else {
-            addMessagesToConversation()
+            addConversationToDatabase()
             client.pc.close()
             microphoneIcon.clearAnimation()
             statusText.text = "Idle"
             microphoneIcon.setColorFilter(getColor(androidx.appcompat.R.color.abc_background_cache_hint_selector_material_dark))
             statusText.setTextColor(getColor(R.color.secondary))
         }
+    }
+
+    private fun addConversationToDatabase(){
+        if (messageAdapter.itemCount != 0){
+            Log.d("[addConversationToDatabase]", "Adding conversation to database")
+        LocationTimeUtils.getCurrentDateTimeLocation(this) { date, time, location ->
+            Log.d("[toggleSession]", "Location: $location")
+            val newConversation = Conversation(
+                date = date,
+                time = time,
+                start = location,
+                destination = "Unknown" // You'll need to determine destination separately
+            )
+            
+            lifecycleScope.launch {
+                // Insert conversation in a background thread
+                withContext(Dispatchers.IO) {
+                    // Insert the conversation and get the ID
+                    conversationID = assistant.insertConversation(newConversation).toInt()
+                    addMessagesToConversation()
+                    Log.d("[toggleSession]", "newConversation inserted with ID: $conversationID")
+                }
+            }
+        }
+    }
     }
 
     private fun addMessagesToConversation(){
