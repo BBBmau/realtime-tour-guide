@@ -20,15 +20,21 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.exploreai.AssistantApplication
 import com.example.exploreai.Conversation
 import com.example.exploreai.ConversationMessage
+import com.example.exploreai.MessageDao
 import com.example.exploreai.R
 import com.example.exploreai.settings.ToggleSettingsActivity
 import com.example.exploreai.databinding.ActivityAssistantBinding
+import com.example.exploreai.settings.flattenToList
 import com.example.exploreai.webrtc.webRTCclient
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.count
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.webrtc.SessionDescription
 import kotlin.properties.Delegates
+import com.example.exploreai.utils.LocationTimeUtils
 
 
 lateinit var EPHEMERAL_KEY: String
@@ -36,7 +42,7 @@ lateinit var EPHEMERAL_KEY: String
 
 class AssistantActivityActivity : AppCompatActivity() {
 
-    var conversationID by Delegates.notNull<Long>()
+    private var conversationID: Int = -1
     private lateinit var client : webRTCclient
     private  val audioPlayback = AudioPlayback()
     private lateinit var microphoneIcon: ImageView
@@ -104,21 +110,27 @@ class AssistantActivityActivity : AppCompatActivity() {
         if (inSession) {
             messageAdapter.clearConversation() // clear the previous conversation
             Log.d("[toggleSession]", "Session in Progress")
+            
+            LocationTimeUtils.getCurrentDateTimeLocation(this) { date, time, location ->
+                Log.d("[toggleSession]", "Location: $location")
                 val newConversation = Conversation(
-                    date = "January 20, 2024",
-                    time = "8:00PM",
-                    start = "La Jolla, CA",
-                    destination = "Riverside, CA"
+                    date = date,
+                    time = time,
+                    start = location,
+                    destination = "Unknown" // You'll need to determine destination separately
                 )
+                
                 lifecycleScope.launch {
                     // Insert conversation in a background thread
                     withContext(Dispatchers.IO) {
                         // Insert the conversation and get the ID
-                        conversationID = assistant.insertConversation(newConversation)
+                        conversationID = assistant.insertConversation(newConversation).toInt()
                         
                         Log.d("[toggleSession]", "newConversation inserted with ID: $conversationID")
                     }
+                }
             }
+            
             startRealtimeSession()
             microphoneIcon.startAnimation(pulseAnimation)
             statusText.text = "In conversation..."
@@ -141,7 +153,7 @@ class AssistantActivityActivity : AppCompatActivity() {
                 withContext(Dispatchers.IO) {
                     messageAdapter.getAllMessages().forEach{ msg -> 
                         assistant.insertMessage(ConversationMessage(
-                            conversationId = conversationID, 
+                            conversationId = conversationID.toLong(),
                             time = "${msg.timestamp}", 
                             isFromUser = msg.isFromUser,
                             text = msg.text
@@ -207,6 +219,18 @@ class AssistantActivityActivity : AppCompatActivity() {
             }
             else -> {
                 requestPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+            }
+        }
+
+        when {
+            ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION,
+            ) == PackageManager.PERMISSION_GRANTED -> {
+                Log.d("Assistant", "Assistant received permissions for location")
+            }
+            else -> {
+                requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
             }
         }
     when{
