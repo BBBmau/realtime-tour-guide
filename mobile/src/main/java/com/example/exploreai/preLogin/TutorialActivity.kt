@@ -5,6 +5,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import com.example.exploreai.databinding.ActivityTutorialBinding
 import android.os.Bundle
+import com.auth0.android.Auth0
 import com.google.android.material.tabs.TabLayoutMediator
 
 class AssistantApplication : Application() {
@@ -19,11 +20,17 @@ class AssistantApplication : Application() {
 class TutorialActivity : AppCompatActivity() {
     private lateinit var binding: ActivityTutorialBinding
     private lateinit var pagerAdapter: TutorialPagerAdapter
+    private lateinit var account: Auth0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityTutorialBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        account = Auth0(
+            "LSN9l3iMrWtRyrLgTTjbOGJIbMbkFF2i",
+            "dev-y5kpzumi7ghqmuzh.us.auth0.com"
+        )
 
         setupViewPager()
         setupButtons()
