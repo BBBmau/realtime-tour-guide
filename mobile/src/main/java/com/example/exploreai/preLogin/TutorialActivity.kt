@@ -24,40 +24,12 @@ class AssistantApplication : Application() {
 class TutorialActivity : AppCompatActivity() {
     private lateinit var binding: ActivityTutorialBinding
     private lateinit var pagerAdapter: TutorialPagerAdapter
-    private lateinit var account: Auth0
-
-    private fun loginWithBrowser() {
-        // Setup the WebAuthProvider, using the custom scheme and scope.
-
-        WebAuthProvider.login(account)
-            .withScheme("demo")
-            .withScope("openid profile email")
-            // Launch the authentication passing the callback where the results will be received
-            .start(this, object : Callback<Credentials, AuthenticationException> {
-                // Called when there is an authentication failure
-                override fun onFailure(exception: AuthenticationException) {
-                    // Something went wrong!
-                }
-
-                // Called when authentication completed successfully
-                override fun onSuccess(credentials: Credentials) {
-                    // Get the access token from the credentials object.
-                    // This can be used to call APIs
-                    val accessToken = credentials.accessToken
-                }
-            })
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityTutorialBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        account = Auth0(
-            "LSN9l3iMrWtRyrLgTTjbOGJIbMbkFF2i",
-            "dev-y5kpzumi7ghqmuzh.us.auth0.com"
-        )
-        loginWithBrowser()
         setupViewPager()
         setupButtons()
     }
