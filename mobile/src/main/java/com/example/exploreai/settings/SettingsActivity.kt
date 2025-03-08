@@ -62,6 +62,8 @@ class ToggleSettingsActivity : AppCompatActivity() {
                 // TODO: Save this value to your preferences/settings
             }
         }
+
+        // TODO: add field / page to pick what the tour guide should be on the lookout for
         
         // Set up destination field
         binding.destinationField.editText?.setOnFocusChangeListener { _, hasFocus ->

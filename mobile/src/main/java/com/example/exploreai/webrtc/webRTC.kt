@@ -1,6 +1,7 @@
 package com.example.exploreai.webrtc
 
 import android.content.Context
+import android.media.AudioManager
 import android.util.Log
 import com.example.exploreai.assistant.AssistantActivityActivity
 import com.google.gson.Gson
@@ -8,6 +9,7 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.coroutineScope
 import org.json.JSONException
 import org.json.JSONObject
+import org.webrtc.AudioTrack
 import org.webrtc.DataChannel
 import org.webrtc.IceCandidate
 import org.webrtc.MediaConstraints
@@ -28,12 +30,14 @@ class webRTCclient {
     lateinit var pc: PeerConnection
     lateinit var dc: DataChannel
     private var pcf: PeerConnectionFactory
+    private lateinit var audioManager: AudioManager
 
     lateinit var assistantActivity: AssistantActivityActivity
 
     // Primary constructor with no arguments
     constructor(ctx: Context, activity: AssistantActivityActivity) {
         assistantActivity = activity
+        audioManager = ctx.getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
         // Initialize PeerConnectionFactory globals.
         val initializationOptions = PeerConnectionFactory.InitializationOptions.builder(ctx)
@@ -60,7 +64,7 @@ class webRTCclient {
             override fun onTrack(transceiver: RtpTransceiver?) {
                 val receiver = transceiver?.receiver
                 val track = receiver?.track()
-                Log.d("[onTrack]", "Received audio track: ${track?.id()}")
+                Log.d("[onAudioTrack]", "Received audio track: ${track?.id()}")
             }
 
 
@@ -76,6 +80,9 @@ class webRTCclient {
                         Log.d("WebRTC", "ICE Connected!")
                         Log.d("[peerConnection]","connection state: ${pc.connectionState()}")
                         Log.d("[dataChannel]", "state: ${dc.state()}")
+                        
+                        // Enable speakerphone when connection is established
+                        enableSpeakerphone(true)
                     }
                     PeerConnection.IceConnectionState.FAILED -> {
                         // Connection failed
@@ -203,7 +210,7 @@ class webRTCclient {
             }
 
             val constraints = MediaConstraints().apply {
-                mandatory.add(MediaConstraints.KeyValuePair("OfferToReceiveAudio", "false"))
+                mandatory.add(MediaConstraints.KeyValuePair("OfferToReceiveAudio", "true"))
                 mandatory.add(MediaConstraints.KeyValuePair("OfferToReceiveVideo", "false"))
             }
 
@@ -346,6 +353,25 @@ class webRTCclient {
             // Handle state change
             Log.d("[dataChannelObserver]", "state change")
         }
+    }
+
+    fun enableSpeakerphone(enable: Boolean) {
+        // Save the current mode to restore later if needed
+        val previousMode = audioManager.mode
+        
+        // Set audio mode for communication
+        audioManager.mode = AudioManager.MODE_IN_COMMUNICATION
+        
+        // Enable/disable speakerphone
+        audioManager.isSpeakerphoneOn = enable
+        
+        Log.d("WebRTC", "Speakerphone ${if(enable) "enabled" else "disabled"}")
+    }
+
+    fun cleanupAudio() {
+        // Reset audio settings when done
+        audioManager.isSpeakerphoneOn = false
+        audioManager.mode = AudioManager.MODE_NORMAL
     }
 }
 
