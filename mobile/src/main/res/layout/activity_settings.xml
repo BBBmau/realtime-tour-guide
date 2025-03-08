@@ -56,28 +56,74 @@
                     android:text="Notifications" />
 
                 <View
+                    android:id="@+id/notificationTimerDivider"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="#E0E0E0" />
+                    android:background="#E0E0E0"
+                    android:visibility="gone" />
 
-                <!-- Dark Mode Switch -->
-                <com.google.android.material.switchmaterial.SwitchMaterial
-                    android:id="@+id/darkModeSwitch"
+                <!-- Notification Timer with Number Picker -->
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Dark Mode" />
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:id="@+id/notificationTimerPickerLayout"
+                    android:paddingVertical="8dp"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Notification Timer"
+                        android:textSize="16sp"/>
+
+                    <Space
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1" />
+
+                    <NumberPicker
+                        android:id="@+id/notificationTimerPicker"
+                        android:layout_width="wrap_content"
+                        android:layout_height="100dp"
+                        android:layout_marginStart="16dp"
+                        android:descendantFocusability="blocksDescendants" />
+                </LinearLayout>
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:background="#E0E0E0" />
 
-                <!-- Sound Effects Switch -->
-                <com.google.android.material.switchmaterial.SwitchMaterial
-                    android:id="@+id/soundSwitch"
+                <!-- Replacing TextInputLayout with horizontal layout -->
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Sound Effects" />
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingVertical="8dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Destination"
+                        android:textSize="16sp"/>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/destinationField"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Enter destination"
+                            android:textAlignment="viewEnd" />
+                    </com.google.android.material.textfield.TextInputLayout>
+                </LinearLayout>
 
                 <View
                     android:layout_width="match_parent"
