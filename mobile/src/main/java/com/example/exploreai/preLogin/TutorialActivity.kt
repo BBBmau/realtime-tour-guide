@@ -13,14 +13,6 @@ import com.auth0.android.callback.Callback
 import com.auth0.android.provider.WebAuthProvider
 import com.google.android.material.tabs.TabLayoutMediator
 
-class AssistantApplication : Application() {
-    // Using by lazy so the database and the repository are only created when they're needed
-    // rather than when the application starts
-    val database by lazy { ConversationRoomDatabase.getDatabase(this) }
-    val repository by lazy { Repository(database.conversationDAO(), database.messageDAO() ) }
-
-}
-
 // TutorialActivity.kt
 class TutorialActivity : AppCompatActivity() {
     private lateinit var binding: ActivityTutorialBinding

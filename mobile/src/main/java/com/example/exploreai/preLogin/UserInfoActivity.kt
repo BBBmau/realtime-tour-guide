@@ -12,6 +12,7 @@ import com.auth0.android.provider.WebAuthProvider
 import com.auth0.android.result.Credentials
 import com.example.exploreai.assistant.AssistantActivityActivity
 import com.example.exploreai.databinding.ActivityUserInfoBinding
+import com.example.exploreai.utils.TokenManager
 
 class UserInfoActivity : AppCompatActivity() {
     private lateinit var binding: ActivityUserInfoBinding

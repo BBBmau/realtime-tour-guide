@@ -1,7 +1,6 @@
-package com.example.exploreai
+package com.example.exploreai.utils
 
 import android.content.Context
-import com.auth0.android.Auth0
 
 // Create a TokenManager object to handle token operations
 object TokenManager {
