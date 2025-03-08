@@ -13,7 +13,6 @@ android {
     defaultConfig {
         minSdkVersion 29
         targetSdkVersion 34
-
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     kotlinOptions {
@@ -41,6 +40,7 @@ dependencies {
 
     implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:2.5.0-alpha01")
     implementation ("com.google.android.gms:play-services-location:21.3.0")
+    implementation ('com.auth0.android:auth0:2.+')
 
 
     // Retrofit - HTTP Client setup
