@@ -19,7 +19,8 @@ class ToggleSettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySettingsBinding.inflate(layoutInflater)
-        binding.loggedInAs.text = "Logged in as ${TokenManager.getUser()}"
+        val userName = TokenManager.getUser(this)
+        binding.loggedInAs.text = "Logged in as $userName"
         setContentView(binding.root)
         account = Auth0(
             "LSN9l3iMrWtRyrLgTTjbOGJIbMbkFF2i",
