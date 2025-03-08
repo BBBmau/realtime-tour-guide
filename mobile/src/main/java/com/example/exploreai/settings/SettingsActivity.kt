@@ -10,6 +10,7 @@ import com.auth0.android.callback.Callback
 import com.auth0.android.provider.WebAuthProvider
 import com.example.exploreai.UserInfoActivity
 import com.example.exploreai.databinding.ActivitySettingsBinding
+import com.example.exploreai.utils.TokenManager
 
 class ToggleSettingsActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySettingsBinding
@@ -18,6 +19,7 @@ class ToggleSettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySettingsBinding.inflate(layoutInflater)
+        binding.loggedInAs.text = "Logged in as ${TokenManager.getUser()}"
         setContentView(binding.root)
         account = Auth0(
             "LSN9l3iMrWtRyrLgTTjbOGJIbMbkFF2i",

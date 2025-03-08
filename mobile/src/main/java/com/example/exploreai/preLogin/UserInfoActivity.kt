@@ -37,7 +37,7 @@ class UserInfoActivity : AppCompatActivity() {
                     // Get the access token from the credentials object.
                     // This can be used to call APIs
                     startActivity(Intent(applicationContext, AssistantActivityActivity::class.java))
-                    TokenManager.saveToken(applicationContext, result.accessToken)
+                    TokenManager.saveToken(applicationContext, result)
                     Toast.makeText(applicationContext,"success!", Toast.LENGTH_SHORT).show()
                     finish() // Optional: prevents going back
                 }

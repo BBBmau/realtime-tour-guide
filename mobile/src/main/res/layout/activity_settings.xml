@@ -100,6 +100,7 @@
                     android:text="Logout" />
 
                 <TextView
+                    android:id="@+id/loggedInAs"
                     android:textAlignment="center"
                     android:text="Logged in as INSERT USER"
                     android:layout_width="match_parent"
