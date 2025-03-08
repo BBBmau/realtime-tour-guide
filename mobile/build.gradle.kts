@@ -18,7 +18,10 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
-
+        manifestPlaceholders.apply {
+            put("auth0Domain", "@string/com_auth0_domain")
+            put("auth0Scheme", "demo")
+        }
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 

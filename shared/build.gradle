@@ -13,7 +13,6 @@ android {
     defaultConfig {
         minSdkVersion 29
         targetSdkVersion 34
-        manifestPlaceholders = [auth0Domain: "@string/com_auth0_domain", auth0Scheme: "demo"]
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     kotlinOptions {
