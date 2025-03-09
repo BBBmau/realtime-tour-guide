@@ -35,6 +35,7 @@ import kotlinx.coroutines.withContext
 import org.webrtc.SessionDescription
 import kotlin.properties.Delegates
 import com.example.exploreai.utils.LocationTimeUtils
+import com.example.exploreai.utils.PreferencesManager
 
 
 lateinit var EPHEMERAL_KEY: String
@@ -50,6 +51,8 @@ class AssistantActivityActivity : AppCompatActivity() {
     private lateinit var pulseAnimation: Animation
     private var inSession = false
     private lateinit var messageAdapter: MessageAdapter
+    private lateinit var dest: String
+    private lateinit var loc: String
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -69,11 +72,16 @@ class AssistantActivityActivity : AppCompatActivity() {
         )[AssistantViewModel::class.java]
 
         client = webRTCclient(this, this)
+        //TODO: we shouldn't need to call this twice
+        LocationTimeUtils.getCurrentDateTimeLocation(this) { _, _, location ->
+            loc = location
 
-        // TODO: ephemeral key fetch should only be requested when expired.
-        assistant.fetch() // TODO: only works on physical device and not emulator
-        assistant.resp.observe(this) { response ->
-            EPHEMERAL_KEY = response.clientSecret.value
+            dest = PreferencesManager(this).getLocation()!!
+            // TODO: ephemeral key fetch should only be requested when expired.
+            assistant.fetch(loc, dest) // TODO: only works on physical device and not emulator
+            assistant.resp.observe(this) { response ->
+                EPHEMERAL_KEY = response.clientSecret.value
+            }
         }
 
         checkPermissionAndSetup()
@@ -137,7 +145,7 @@ class AssistantActivityActivity : AppCompatActivity() {
                 start = location,
                 destination = "Unknown" // You'll need to determine destination separately
             )
-            
+            PreferencesManager(this).setLocation(location)
             lifecycleScope.launch {
                 // Insert conversation in a background thread
                 withContext(Dispatchers.IO) {

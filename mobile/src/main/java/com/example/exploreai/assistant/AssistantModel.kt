@@ -10,7 +10,9 @@ interface ExploreAiAssistantService {
 
     // requests OpenAi Ephemeral Key from GCP Server after it receives it from OpenAI directly
     @GET("session")
-    suspend fun getResponse(): ExploreAiEphemeralResp
+    suspend fun getResponse(@Query("location") location: String,
+                            @Query("destination") destination: String
+    ): ExploreAiEphemeralResp
 
     @POST("realtime")
     suspend fun startSession(

@@ -64,9 +64,9 @@ class AssistantViewModel(private val repository: Repository) : ViewModel() {
     }
 
 
-    fun fetch() {
+    fun fetch(location:String, destination: String) {
         viewModelScope.launch {
-            _data.value = repository.fetch()
+            _data.value = repository.fetch(location, destination)
         }
     }
 

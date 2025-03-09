@@ -1,6 +1,7 @@
 package com.example.exploreai.settings
 
 import android.content.Intent
+import android.graphics.Rect
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -12,6 +13,7 @@ import com.auth0.android.provider.WebAuthProvider
 import com.example.exploreai.UserInfoActivity
 import com.example.exploreai.databinding.ActivitySettingsBinding
 import com.example.exploreai.R
+import com.example.exploreai.utils.PreferencesManager
 import com.example.exploreai.utils.TokenManager
 
 class ToggleSettingsActivity : AppCompatActivity() {
@@ -23,6 +25,7 @@ class ToggleSettingsActivity : AppCompatActivity() {
         binding = ActivitySettingsBinding.inflate(layoutInflater)
         val userName = TokenManager.getUser(this)
         binding.loggedInAs.text = "Logged in as $userName"
+        binding.destinationField.editText?.setText(PreferencesManager(this).getDestination())
         setContentView(binding.root)
         account = Auth0(
             "LSN9l3iMrWtRyrLgTTjbOGJIbMbkFF2i",
@@ -40,6 +43,9 @@ class ToggleSettingsActivity : AppCompatActivity() {
         // Set initial visibility state
         binding.notificationTimerPickerLayout.visibility = View.GONE
         timerDivider?.visibility = View.GONE
+        
+        // Setup keyboard visibility listener
+        setupKeyboardVisibilityListener()
         
         binding.notificationSwitch.setOnCheckedChangeListener { _, isChecked ->
             // Toggle visibility based on switch state
@@ -69,7 +75,7 @@ class ToggleSettingsActivity : AppCompatActivity() {
         binding.destinationField.editText?.setOnFocusChangeListener { _, hasFocus ->
             if (!hasFocus) {
                 val destination = binding.destinationField.editText?.text.toString()
-                // TODO: Save destination to your preferences/settings
+                PreferencesManager(this).setDestination(destination)
                 Log.d("Destination", "Destination set to: $destination")
             }
         }
@@ -101,5 +107,23 @@ class ToggleSettingsActivity : AppCompatActivity() {
                     Log.d("[logout]", "$error")
                 }
             })
+    }
+
+    private fun setupKeyboardVisibilityListener() {
+        val rootView = window.decorView.rootView
+        rootView.viewTreeObserver.addOnGlobalLayoutListener {
+            val r = Rect()
+            rootView.getWindowVisibleDisplayFrame(r)
+            val screenHeight = rootView.height
+            
+            // Calculate keyboard height
+            val keyboardHeight = screenHeight - r.bottom
+            
+            // If keyboard height is less than 15% of screen height, consider it hidden
+            if (keyboardHeight < screenHeight * 0.15) {
+                // Keyboard is hidden, clear focus from EditText
+                binding.destinationField.editText?.clearFocus()
+            }
+        }
     }
 }

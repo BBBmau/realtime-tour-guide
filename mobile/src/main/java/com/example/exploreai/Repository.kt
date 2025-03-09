@@ -37,9 +37,9 @@ class Repository(private val conversationDao: ConversationDao, private val messa
     }
 
     // the fetch is for the ephemeral key
-    suspend fun fetch(): ExploreAiEphemeralResp? {
+    suspend fun fetch(location: String, destination: String): ExploreAiEphemeralResp? {
         return try{
-            val resp = AssistantClient.apiService.getResponse()
+            val resp = AssistantClient.apiService.getResponse(location, destination)
             Log.d("[REPOSITORY CALL]", "$resp")
             resp
         } catch (e: Exception){
@@ -51,7 +51,7 @@ class Repository(private val conversationDao: ConversationDao, private val messa
     // used for when user interacts with the assistant with the resp being from the assistant
     suspend fun startSession(sdp: String): Result<String> {
         return try {
-            val response = AssistantClient.openAiService.startSession(sdp, "model=gpt-4o-realtime-preview-2024-12-17")
+            val response = AssistantClient.openAiService.startSession(sdp, "model=gpt-4o-mini-realtime-preview-2024-12-17")
             if (response.isSuccessful) {
                 Result.success(response.body() ?: "")
             } else {
