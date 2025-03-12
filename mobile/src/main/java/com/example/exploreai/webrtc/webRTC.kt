@@ -1,9 +1,9 @@
-package com.example.exploreai.webrtc
+package com.mau.exploreai.webrtc
 
 import android.content.Context
 import android.media.AudioManager
 import android.util.Log
-import com.example.exploreai.assistant.AssistantActivityActivity
+import com.mau.exploreai.assistant.AssistantActivityActivity
 import com.google.gson.Gson
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.coroutineScope

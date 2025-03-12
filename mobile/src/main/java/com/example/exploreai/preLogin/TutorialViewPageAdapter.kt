@@ -1,4 +1,4 @@
-package com.example.exploreai
+package com.mau.exploreai
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity

@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.exploreai"
+    namespace = "com.mau.exploreai"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.exploreai"
+        applicationId = "com.mau.exploreai"
         minSdk = 29
         targetSdk = 34
         versionCode = 1

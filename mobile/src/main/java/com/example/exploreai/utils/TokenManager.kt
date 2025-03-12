@@ -1,4 +1,4 @@
-package com.example.exploreai.utils
+package com.mau.exploreai.utils
 
 import android.content.Context
 import com.auth0.android.result.Credentials

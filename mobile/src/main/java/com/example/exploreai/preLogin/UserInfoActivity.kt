@@ -1,4 +1,4 @@
-package com.example.exploreai
+package com.mau.exploreai
 
 import android.content.Intent
 import android.os.Bundle
@@ -10,9 +10,9 @@ import com.auth0.android.authentication.AuthenticationException
 import com.auth0.android.callback.Callback
 import com.auth0.android.provider.WebAuthProvider
 import com.auth0.android.result.Credentials
-import com.example.exploreai.assistant.AssistantActivityActivity
-import com.example.exploreai.databinding.ActivityUserInfoBinding
-import com.example.exploreai.utils.TokenManager
+import com.mau.exploreai.assistant.AssistantActivityActivity
+import com.mau.exploreai.databinding.ActivityUserInfoBinding
+import com.mau.exploreai.utils.TokenManager
 
 class UserInfoActivity : AppCompatActivity() {
     private lateinit var binding: ActivityUserInfoBinding

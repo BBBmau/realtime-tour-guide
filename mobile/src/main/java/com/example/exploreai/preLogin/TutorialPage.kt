@@ -1,4 +1,4 @@
-package com.example.exploreai
+package com.mau.exploreai
 
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize

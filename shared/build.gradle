@@ -5,7 +5,7 @@ plugins {
     id 'kotlin-kapt'
 }
 android {
-    namespace 'com.example.exploreai.shared'
+    namespace 'com.mau.exploreai.shared'
     compileSdkVersion 34
     buildFeatures{
         viewBinding true

@@ -1,4 +1,4 @@
-package com.example.exploreai.assistant
+package com.mau.exploreai.assistant
 
 import android.util.Log
 import androidx.lifecycle.LiveData
@@ -6,10 +6,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.exploreai.Conversation
-import com.example.exploreai.ConversationMessage
-import com.example.exploreai.Repository
-import com.example.exploreai.webrtc.webRTCclient
+import com.mau.exploreai.Conversation
+import com.mau.exploreai.ConversationMessage
+import com.mau.exploreai.Repository
+import com.mau.exploreai.webrtc.webRTCclient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

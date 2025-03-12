@@ -1,11 +1,11 @@
-package com.example.exploreai
+package com.mau.exploreai
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.example.exploreai.databinding.FragmentTutorialBinding
+import com.mau.exploreai.databinding.FragmentTutorialBinding
 
 // TutorialFragment.kt
 class TutorialFragment : Fragment() {

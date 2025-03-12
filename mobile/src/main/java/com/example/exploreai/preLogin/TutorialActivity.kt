@@ -1,10 +1,10 @@
-package com.example.exploreai
+package com.mau.exploreai
 
 import android.app.Application
 import android.content.Intent
 import com.auth0.android.result.Credentials
 import androidx.appcompat.app.AppCompatActivity
-import com.example.exploreai.databinding.ActivityTutorialBinding
+import com.mau.exploreai.databinding.ActivityTutorialBinding
 import android.os.Bundle
 import android.widget.Toast
 import com.auth0.android.Auth0

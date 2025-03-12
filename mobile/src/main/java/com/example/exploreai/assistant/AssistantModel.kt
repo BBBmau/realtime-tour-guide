@@ -1,4 +1,4 @@
-package com.example.exploreai.assistant
+package com.mau.exploreai.assistant
 import com.google.gson.annotations.SerializedName
 import retrofit2.http.GET
 import retrofit2.http.POST

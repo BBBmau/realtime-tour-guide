@@ -1,4 +1,4 @@
-package com.example.exploreai.settings
+package com.mau.exploreai.settings
 
 import android.content.Intent
 import android.graphics.Rect
@@ -10,11 +10,11 @@ import com.auth0.android.Auth0
 import com.auth0.android.authentication.AuthenticationException
 import com.auth0.android.callback.Callback
 import com.auth0.android.provider.WebAuthProvider
-import com.example.exploreai.UserInfoActivity
-import com.example.exploreai.databinding.ActivitySettingsBinding
-import com.example.exploreai.R
-import com.example.exploreai.utils.PreferencesManager
-import com.example.exploreai.utils.TokenManager
+import com.mau.exploreai.UserInfoActivity
+import com.mau.exploreai.databinding.ActivitySettingsBinding
+import com.mau.exploreai.R
+import com.mau.exploreai.utils.PreferencesManager
+import com.mau.exploreai.utils.TokenManager
 
 class ToggleSettingsActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySettingsBinding

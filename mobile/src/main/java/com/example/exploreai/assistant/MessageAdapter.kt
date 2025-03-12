@@ -1,4 +1,4 @@
-package com.example.exploreai.assistant
+package com.mau.exploreai.assistant
 
 import android.graphics.Color
 import android.util.Log
@@ -10,7 +10,7 @@ import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.exploreai.R
+import com.mau.exploreai.R
 
 data class Message(
     val text: String,

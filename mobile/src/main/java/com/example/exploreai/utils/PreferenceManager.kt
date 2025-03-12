@@ -1,4 +1,4 @@
-package com.example.exploreai.utils
+package com.mau.exploreai.utils
 
 import android.content.Context
 import android.content.SharedPreferences

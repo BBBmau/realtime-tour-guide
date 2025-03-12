@@ -1,4 +1,4 @@
-package com.example.exploreai.assistant
+package com.mau.exploreai.assistant
 
 import android.Manifest
 import android.content.Intent
@@ -17,15 +17,15 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.exploreai.AssistantApplication
-import com.example.exploreai.Conversation
-import com.example.exploreai.ConversationMessage
-import com.example.exploreai.MessageDao
-import com.example.exploreai.R
-import com.example.exploreai.settings.ToggleSettingsActivity
-import com.example.exploreai.databinding.ActivityAssistantBinding
-import com.example.exploreai.settings.flattenToList
-import com.example.exploreai.webrtc.webRTCclient
+import com.mau.exploreai.AssistantApplication
+import com.mau.exploreai.Conversation
+import com.mau.exploreai.ConversationMessage
+import com.mau.exploreai.MessageDao
+import com.mau.exploreai.R
+import com.mau.exploreai.settings.ToggleSettingsActivity
+import com.mau.exploreai.databinding.ActivityAssistantBinding
+import com.mau.exploreai.settings.flattenToList
+import com.mau.exploreai.webrtc.webRTCclient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.flow.first
@@ -34,8 +34,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.webrtc.SessionDescription
 import kotlin.properties.Delegates
-import com.example.exploreai.utils.LocationTimeUtils
-import com.example.exploreai.utils.PreferencesManager
+import com.mau.exploreai.utils.LocationTimeUtils
+import com.mau.exploreai.utils.PreferencesManager
 
 
 lateinit var EPHEMERAL_KEY: String
@@ -143,7 +143,7 @@ class AssistantActivityActivity : AppCompatActivity() {
                 date = date,
                 time = time,
                 start = location,
-                destination = "Unknown" // You'll need to determine destination separately
+                destination = PreferencesManager(this).getDestination()
             )
             PreferencesManager(this).setLocation(location)
             lifecycleScope.launch {

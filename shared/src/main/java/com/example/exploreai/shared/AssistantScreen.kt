@@ -1,4 +1,4 @@
-package com.example.exploreai.shared
+package com.mau.exploreai.shared
 
 import androidx.car.app.CarContext
 import androidx.car.app.Screen

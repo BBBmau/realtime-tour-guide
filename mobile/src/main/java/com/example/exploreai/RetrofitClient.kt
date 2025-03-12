@@ -1,9 +1,9 @@
-package com.example.exploreai
+package com.mau.exploreai
 
 import android.util.Log
-import com.example.exploreai.assistant.EPHEMERAL_KEY
-import com.example.exploreai.assistant.ExploreAiAssistantService
-import com.example.exploreai.assistant.SessionBody
+import com.mau.exploreai.assistant.EPHEMERAL_KEY
+import com.mau.exploreai.assistant.ExploreAiAssistantService
+import com.mau.exploreai.assistant.SessionBody
 import okhttp3.Interceptor
 import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaType

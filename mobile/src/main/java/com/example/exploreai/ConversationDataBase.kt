@@ -1,4 +1,4 @@
-package com.example.exploreai
+package com.mau.exploreai
 
 import android.content.Context
 import androidx.room.ColumnInfo

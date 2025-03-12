@@ -3,7 +3,7 @@
     <application>
         <!-- Car App Service -->
         <service
-            android:name="com.example.exploreai.CarAssistantService"
+            android:name="com.mau.exploreai.CarAssistantService"
             android:exported="true">
             <intent-filter>
                 <action android:name="androidx.car.app.CarAppService" />

@@ -1,4 +1,4 @@
-package com.example.exploreai.assistant
+package com.mau.exploreai.assistant
 
 import android.media.AudioAttributes
 import android.media.AudioFormat

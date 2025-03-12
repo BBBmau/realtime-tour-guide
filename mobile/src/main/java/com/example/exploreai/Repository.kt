@@ -1,12 +1,12 @@
-package com.example.exploreai
+package com.mau.exploreai
 
 import android.util.Log
 import androidx.annotation.WorkerThread
-import com.example.exploreai.assistant.AssistantRequest
-import com.example.exploreai.assistant.AssistantResponse
-import com.example.exploreai.assistant.ExploreAiEphemeralResp
-import com.example.exploreai.assistant.Message
-import com.example.exploreai.assistant.SessionBody
+import com.mau.exploreai.assistant.AssistantRequest
+import com.mau.exploreai.assistant.AssistantResponse
+import com.mau.exploreai.assistant.ExploreAiEphemeralResp
+import com.mau.exploreai.assistant.Message
+import com.mau.exploreai.assistant.SessionBody
 import kotlinx.coroutines.flow.Flow
 
 // Repository class to handle data operations

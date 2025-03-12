@@ -1,4 +1,4 @@
-package com.example.exploreai.settings
+package com.mau.exploreai.settings
 
 import android.content.Context
 import android.content.Intent
@@ -14,9 +14,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.exploreai.Conversation
-import com.example.exploreai.R
-import com.example.exploreai.assistant.assistant
+import com.mau.exploreai.Conversation
+import com.mau.exploreai.R
+import com.mau.exploreai.assistant.assistant
 import com.google.android.material.appbar.MaterialToolbar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
