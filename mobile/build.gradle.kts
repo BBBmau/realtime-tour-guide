@@ -16,7 +16,7 @@ android {
         applicationId = "com.mau.exploreai"
         minSdk = 29
         targetSdk = 34
-        versionCode = 1
+        versionCode = 2
         versionName = "1.0"
         manifestPlaceholders.apply {
             put("auth0Domain", "@string/com_auth0_domain")
