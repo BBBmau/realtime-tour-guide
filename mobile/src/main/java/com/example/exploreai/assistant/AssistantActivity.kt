@@ -17,23 +17,17 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.exploreai.R
+import com.example.exploreai.databinding.ActivityAssistantBinding
 import com.mau.exploreai.AssistantApplication
 import com.mau.exploreai.Conversation
 import com.mau.exploreai.ConversationMessage
-import com.mau.exploreai.MessageDao
-import com.mau.exploreai.R
 import com.mau.exploreai.settings.ToggleSettingsActivity
-import com.mau.exploreai.databinding.ActivityAssistantBinding
-import com.mau.exploreai.settings.flattenToList
-import com.mau.exploreai.webrtc.webRTCclient
+import com.mau.exploreai.webrtc.WebRTCClient
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.count
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.webrtc.SessionDescription
-import kotlin.properties.Delegates
 import com.mau.exploreai.utils.LocationTimeUtils
 import com.mau.exploreai.utils.PreferencesManager
 
@@ -44,7 +38,7 @@ lateinit var EPHEMERAL_KEY: String
 class AssistantActivityActivity : AppCompatActivity() {
 
     private var conversationID: Int = -1
-    private lateinit var client : webRTCclient
+    private lateinit var webRTCClient : WebRTCClient
     private  val audioPlayback = AudioPlayback()
     private lateinit var microphoneIcon: ImageView
     private lateinit var statusText: TextView
@@ -71,7 +65,7 @@ class AssistantActivityActivity : AppCompatActivity() {
             AssistantViewModelFactory((application as AssistantApplication).repository)
         )[AssistantViewModel::class.java]
 
-        client = webRTCclient(this, this)
+        webRTCClient = WebRTCClient(this, this)
         //TODO: we shouldn't need to call this twice
         LocationTimeUtils.getCurrentDateTimeLocation(this) { _, _, location ->
             loc = location
@@ -126,7 +120,7 @@ class AssistantActivityActivity : AppCompatActivity() {
             //TODO: have ui update in real-time while user is speaking
         } else {
             addConversationToDatabase()
-            client.pc.close()
+            webRTCClient.peerConnection.close()
             microphoneIcon.clearAnimation()
             statusText.text = "Idle"
             microphoneIcon.setColorFilter(getColor(androidx.appcompat.R.color.abc_background_cache_hint_selector_material_dark))
@@ -184,13 +178,13 @@ class AssistantActivityActivity : AppCompatActivity() {
         lifecycleScope.launch {
             try {
                 // Step 1: Create Peer Connection
-                client.createPeerConnection()
+                webRTCClient.createPeerConnection()
 
                 // Step 3: Observe the session response and handle it
-                when (val sessionResult = assistant.createSession(client)) {
+                when (val sessionResult = assistant.createSession(webRTCClient)) {
                     is ApiResult.Success -> {
                         Log.d("[startSession]", "201 SUCCESS")
-                        client.setRemoteDescriptionAsync(
+                        webRTCClient.setRemoteDescription(
                             SessionDescription(SessionDescription.Type.ANSWER, sessionResult.data.sdp)
                         )
                     }
@@ -217,7 +211,7 @@ class AssistantActivityActivity : AppCompatActivity() {
             findViewById<RecyclerView>(R.id.messageList).scrollToPosition(messageAdapter.itemCount - 1)
         }
         if (isFromUser){
-            sendResponseCreate(client.dc, text)
+            sendResponseCreate(webRTCClient.dataChannel, text)
         }
     }
 
