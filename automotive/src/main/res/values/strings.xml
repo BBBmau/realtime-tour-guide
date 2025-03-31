@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">explore.ai</string>
     <string name="assistant_ready">Car Assistant Ready!</string>
+    <string name="com_auth0_domain">dev-y5kpzumi7ghqmuzh.us.auth0.com</string>
 </resources>
