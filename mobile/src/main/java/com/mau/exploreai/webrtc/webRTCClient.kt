@@ -47,7 +47,7 @@ class WebRTCClient(ctx: Context, private val activity: AssistantActivityActivity
     // Public API
     fun createPeerConnection() {
         val pc = peerConnectionManager.createPeerConnection()
-        val dc = dataChannelManager.createDataChannel(pc, activity)
+        dataChannelManager.createDataChannel(pc, activity)
         peerConnectionManager.setupAudioTransceiver()
     }
     
@@ -57,20 +57,4 @@ class WebRTCClient(ctx: Context, private val activity: AssistantActivityActivity
     
     fun setRemoteDescription(description: SessionDescription) =
         sessionDescriptionManager.setRemoteDescription(peerConnection, description)
-    
-    fun cleanupAudio() {
-        audioManager.cleanup()
-    }
 }
-
-data class Event(
-    val event_id: String,
-    val type: String,
-    val session: Session
-)
-
-data class Session(
-    val input_audio_transcription: InputAudioTranscription
-)
-
-data class InputAudioTranscription(val model: String)

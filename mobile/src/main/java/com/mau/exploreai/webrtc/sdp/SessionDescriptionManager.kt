@@ -22,44 +22,32 @@ class SessionDescriptionManager {
                 override fun onCreateSuccess(sessionDescription: SessionDescription) {
                     try {
                         var sdp = sessionDescription.description
-
                         // Modify SDP if needed
                         sdp = sdp.replace("a=setup:active", "a=setup:actpass")
-
                         val sanitizedSDP = SessionDescription(
                             SessionDescription.Type.OFFER,
                             sdp
                         )
-
                         Log.d("[createOffer]", "Setting local description with SDP: ${sanitizedSDP.description}")
 
                         // Wait for setLocalDescription to complete
                         setLocalDescription(peerConnection, sanitizedSDP).invokeOnCompletion { throwable ->
-                            if (throwable != null) {
-                                continuation.resumeWithException(throwable)
-                            } else {
+                            if (throwable != null) { continuation.resumeWithException(throwable) }
+                            else {
                                 // Only continue when local description is set
                                 peerConnection.localDescription?.let { desc ->
                                     continuation.resume(desc.description)
                                 } ?: continuation.resumeWithException(Exception("Local description is null"))
                             }
                         }
-                    } catch (e: Exception) {
-                        continuation.resumeWithException(e)
-                    }
+                    } catch (e: Exception) { continuation.resumeWithException(e) }
                 }
 
-                override fun onCreateFailure(error: String) {
-                    continuation.resumeWithException(Exception("Failed to create offer: $error"))
-                }
+                override fun onCreateFailure(error: String) { continuation.resumeWithException(Exception("Failed to create offer: $error")) }
 
-                override fun onSetSuccess() {
-                    Log.d("[createOffer]", "SUCCESS: set local description")
-                }
+                override fun onSetSuccess() { Log.d("[createOffer]", "SUCCESS: set local description") }
                 
-                override fun onSetFailure(error: String) {
-                    Log.d("[createOffer]", error)
-                }
+                override fun onSetFailure(error: String) { Log.d("[createOffer]", error) }
             }
 
             val constraints = MediaConstraints().apply {
@@ -70,9 +58,7 @@ class SessionDescriptionManager {
             try {
                 peerConnection.createOffer(offerObserver, constraints)
                 Log.d("[createOffer]","signaling state now: ${peerConnection.signalingState()}")
-            } catch (e: Exception) {
-                continuation.resumeWithException(e)
-            }
+            } catch (e: Exception) { continuation.resumeWithException(e) }
         }
     }
 

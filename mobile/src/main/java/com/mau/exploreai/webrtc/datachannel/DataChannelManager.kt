@@ -25,13 +25,9 @@ class DataChannelManager{
                 handleDataChannelMessage(buffer)
             }
             
-            override fun onBufferedAmountChange(amount: Long) {
-                // Handle buffered amount change
-            }
+            override fun onBufferedAmountChange(amount: Long) {}
             
-            override fun onStateChange() {
-                Log.d("[dataChannelObserver]", "state change: ${dataChannel.state()}")
-            }
+            override fun onStateChange() { Log.d("[dataChannelObserver]", "state change: ${dataChannel.state()}") }
         }
     }
     
@@ -45,8 +41,6 @@ class DataChannelManager{
         try {
             val jsonObject = JSONObject(jsonString)
             messageHandler.handleJsonMessage(jsonObject)
-        } catch (e: JSONException) {
-            Log.e("DataChannel", "Failed to parse JSON: ${e.message}")
-        }
+        } catch (e: JSONException) { Log.e("DataChannel", "Failed to parse JSON: ${e.message}") }
     }
 } 
