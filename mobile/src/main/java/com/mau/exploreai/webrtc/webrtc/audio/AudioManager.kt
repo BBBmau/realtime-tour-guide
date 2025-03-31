@@ -1,4 +1,4 @@
-package com.example.exploreai.webrtc.audio
+package com.mau.exploreai.webrtc.webrtc.audio
 
 import android.content.Context
 import android.media.AudioManager as AndroidAudioManager

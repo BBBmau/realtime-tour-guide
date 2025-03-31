@@ -1,4 +1,4 @@
-package com.example.exploreai.webrtc.sdp
+package com.mau.exploreai.webrtc.webrtc.sdp
 
 import android.util.Log
 import kotlinx.coroutines.CompletableDeferred

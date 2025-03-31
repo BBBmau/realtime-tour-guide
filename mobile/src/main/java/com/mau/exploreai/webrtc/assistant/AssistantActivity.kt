@@ -17,11 +17,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.exploreai.R
-import com.example.exploreai.databinding.ActivityAssistantBinding
-import com.mau.exploreai.AssistantApplication
-import com.mau.exploreai.Conversation
-import com.mau.exploreai.ConversationMessage
+import com.mau.exploreai.R
+import com.mau.exploreai.databinding.ActivityAssistantBinding
+import com.mau.exploreai.webrtc.AssistantApplication
+import com.mau.exploreai.webrtc.Conversation
+import com.mau.exploreai.webrtc.ConversationMessage
 import com.mau.exploreai.settings.ToggleSettingsActivity
 import com.mau.exploreai.webrtc.WebRTCClient
 import kotlinx.coroutines.Dispatchers
@@ -65,7 +65,7 @@ class AssistantActivityActivity : AppCompatActivity() {
             AssistantViewModelFactory((application as AssistantApplication).repository)
         )[AssistantViewModel::class.java]
 
-        webRTCClient = WebRTCClient(this, this)
+        webRTCClient = WebRTCClient(this)
         //TODO: we shouldn't need to call this twice
         LocationTimeUtils.getCurrentDateTimeLocation(this) { _, _, location ->
             loc = location
@@ -158,12 +158,14 @@ class AssistantActivityActivity : AppCompatActivity() {
             lifecycleScope.launch {
                 withContext(Dispatchers.IO) {
                     messageAdapter.getAllMessages().forEach{ msg -> 
-                        assistant.insertMessage(ConversationMessage(
+                        assistant.insertMessage(
+                            ConversationMessage(
                             conversationId = conversationID.toLong(),
                             time = "${msg.timestamp}", 
                             isFromUser = msg.isFromUser,
                             text = msg.text
-                        ))
+                        )
+                        )
                     }
                 }
             }

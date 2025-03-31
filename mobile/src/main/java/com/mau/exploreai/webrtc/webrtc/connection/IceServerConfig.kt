@@ -1,4 +1,4 @@
-package com.example.exploreai.webrtc.connection
+package com.mau.exploreai.webrtc.webrtc.connection
 
 import org.webrtc.PeerConnection
 

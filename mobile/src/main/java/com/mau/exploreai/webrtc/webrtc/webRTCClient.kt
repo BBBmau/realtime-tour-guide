@@ -1,18 +1,18 @@
 package com.mau.exploreai.webrtc
 
 import android.content.Context
-import com.mau.exploreai.assistant.AssistantActivityActivity
-import com.example.exploreai.webrtc.audio.AudioManager
-import com.example.exploreai.webrtc.connection.PeerConnectionManager
-import com.example.exploreai.webrtc.datachannel.DataChannelManager
-import com.example.exploreai.webrtc.sdp.SessionDescriptionManager
+import com.mau.exploreai.webrtc.webrtc.audio.AudioManager
+import com.mau.exploreai.webrtc.webrtc.connection.PeerConnectionManager
+import com.mau.exploreai.webrtc.webrtc.datachannel.DataChannelManager
+import com.mau.exploreai.webrtc.webrtc.sdp.SessionDescriptionManager
 import org.webrtc.DataChannel
 import org.webrtc.PeerConnection
 import org.webrtc.PeerConnectionFactory
 import org.webrtc.SessionDescription
 
 // Main client that coordinates between components
-class WebRTCClient(ctx: Context, activity: AssistantActivityActivity) {
+class WebRTCClient(ctx: Context) {
+
     // Core components
     private val peerConnectionManager: PeerConnectionManager
     private val dataChannelManager: DataChannelManager
@@ -35,7 +35,7 @@ class WebRTCClient(ctx: Context, activity: AssistantActivityActivity) {
             
         audioManager = AudioManager(ctx)
         peerConnectionManager = PeerConnectionManager(pcFactory)
-        dataChannelManager = DataChannelManager(activity)
+        dataChannelManager = DataChannelManager()
         sessionDescriptionManager = SessionDescriptionManager()
         
         // Connect components

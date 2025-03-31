@@ -1,16 +1,14 @@
-package com.example.exploreai.webrtc.datachannel
+package com.mau.exploreai.webrtc.webrtc.datachannel
 
 import android.util.Log
 import com.google.gson.Gson
 import com.mau.exploreai.assistant.AssistantActivityActivity
-import com.example.exploreai.webrtc.models.Event
-import com.example.exploreai.webrtc.models.InputAudioTranscription
-import com.example.exploreai.webrtc.models.Session
-import org.json.JSONException
+import com.mau.exploreai.webrtc.webrtc.models.Event
+import com.mau.exploreai.webrtc.webrtc.models.InputAudioTranscription
+import com.mau.exploreai.webrtc.webrtc.models.Session
 import org.json.JSONObject
 import org.webrtc.DataChannel
 import java.nio.ByteBuffer
-import java.nio.charset.Charset
 
 class MessageHandler(
     private val assistantActivity: AssistantActivityActivity,

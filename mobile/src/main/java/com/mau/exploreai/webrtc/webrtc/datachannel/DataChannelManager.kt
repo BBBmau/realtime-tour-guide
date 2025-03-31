@@ -1,20 +1,15 @@
-package com.example.exploreai.webrtc.datachannel
+package com.mau.exploreai.webrtc.webrtc.datachannel
 
 import android.util.Log
-import com.google.gson.Gson
-import com.mau.exploreai.assistant.AssistantActivityActivity
-import com.example.exploreai.webrtc.models.Event
-import com.example.exploreai.webrtc.models.InputAudioTranscription
-import com.example.exploreai.webrtc.models.Session
 import org.json.JSONException
 import org.json.JSONObject
 import org.webrtc.DataChannel
 import org.webrtc.PeerConnection
-import java.nio.ByteBuffer
 import java.nio.charset.Charset
 
-class DataChannelManager(private val assistantActivity: AssistantActivityActivity) {
+class DataChannelManager{
     lateinit var dataChannel: DataChannel
+    lateinit var messageHandler: MessageHandler
     
     fun createDataChannel(peerConnection: PeerConnection): DataChannel {
         dataChannel = peerConnection.createDataChannel("oai-events", DataChannel.Init())!!
@@ -47,20 +42,9 @@ class DataChannelManager(private val assistantActivity: AssistantActivityActivit
         
         try {
             val jsonObject = JSONObject(jsonString)
-            handleJsonMessage(jsonObject)
+            messageHandler.handleJsonMessage(jsonObject)
         } catch (e: JSONException) {
             Log.e("DataChannel", "Failed to parse JSON: ${e.message}")
         }
-    }
-    
-    private fun handleJsonMessage(json: JSONObject) {
-        // ... existing message handling code ...
-    }
-    
-    // Method to send messages through data channel
-    fun sendMessage(message: Any) {
-        val jsonString = Gson().toJson(message)
-        val byteBuffer = ByteBuffer.wrap(jsonString.toByteArray(Charsets.UTF_8))
-        dataChannel.send(DataChannel.Buffer(byteBuffer, false))
     }
 } 

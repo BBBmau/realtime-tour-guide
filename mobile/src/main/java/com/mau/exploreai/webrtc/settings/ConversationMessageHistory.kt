@@ -1,19 +1,15 @@
 package com.mau.exploreai.settings
 
-import android.app.Application
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import com.mau.exploreai.AssistantApplication
-import com.mau.exploreai.Repository
+import com.mau.exploreai.databinding.ActivityConversationMessagesBinding
+import com.mau.exploreai.webrtc.AssistantApplication
 import com.mau.exploreai.assistant.AssistantViewModel
 import com.mau.exploreai.assistant.AssistantViewModelFactory
 import com.mau.exploreai.assistant.ConversationMessageAdapter
-import com.mau.exploreai.assistant.MessageAdapter
-import com.mau.exploreai.databinding.ActivityConversationMessagesBinding
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 

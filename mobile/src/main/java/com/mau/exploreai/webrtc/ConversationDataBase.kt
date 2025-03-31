@@ -1,4 +1,4 @@
-package com.mau.exploreai
+package com.mau.exploreai.webrtc
 
 import android.content.Context
 import androidx.room.ColumnInfo

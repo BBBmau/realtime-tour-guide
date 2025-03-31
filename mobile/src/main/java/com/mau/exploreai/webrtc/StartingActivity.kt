@@ -1,20 +1,14 @@
-package com.mau.exploreai
+package com.mau.exploreai.webrtc
 
 import android.app.Application
 import android.content.Intent
-import com.auth0.android.result.Credentials
 import androidx.appcompat.app.AppCompatActivity
-import com.mau.exploreai.databinding.ActivityTutorialBinding
 import android.os.Bundle
-import android.widget.Toast
-import com.auth0.android.Auth0
-import com.auth0.android.authentication.AuthenticationException
-import com.auth0.android.callback.Callback
-import com.auth0.android.provider.WebAuthProvider
 import com.mau.exploreai.assistant.AssistantActivityActivity
 import com.mau.exploreai.utils.PreferencesManager
 import com.mau.exploreai.utils.TokenManager
-import com.google.android.material.tabs.TabLayoutMediator
+import com.mau.exploreai.TutorialActivity
+import com.mau.exploreai.UserInfoActivity
 
 class AssistantApplication : Application() {
     // Using by lazy so the database and the repository are only created when they're needed

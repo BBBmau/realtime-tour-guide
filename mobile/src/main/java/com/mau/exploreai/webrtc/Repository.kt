@@ -1,12 +1,8 @@
-package com.mau.exploreai
+package com.mau.exploreai.webrtc
 
 import android.util.Log
 import androidx.annotation.WorkerThread
-import com.mau.exploreai.assistant.AssistantRequest
-import com.mau.exploreai.assistant.AssistantResponse
 import com.mau.exploreai.assistant.ExploreAiEphemeralResp
-import com.mau.exploreai.assistant.Message
-import com.mau.exploreai.assistant.SessionBody
 import kotlinx.coroutines.flow.Flow
 
 // Repository class to handle data operations

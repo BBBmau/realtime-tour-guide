@@ -1,20 +1,17 @@
 package com.mau.exploreai.settings
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
-import android.widget.ListView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.mau.exploreai.Conversation
+import com.mau.exploreai.webrtc.Conversation
 import com.mau.exploreai.R
 import com.mau.exploreai.assistant.assistant
 import com.google.android.material.appbar.MaterialToolbar

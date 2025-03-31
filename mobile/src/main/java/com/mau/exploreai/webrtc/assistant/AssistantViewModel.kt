@@ -6,16 +6,15 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.mau.exploreai.Conversation
-import com.mau.exploreai.ConversationMessage
-import com.mau.exploreai.Repository
-import com.mau.exploreai.webrtc.webRTCclient
+import com.mau.exploreai.webrtc.Conversation
+import com.mau.exploreai.webrtc.ConversationMessage
+import com.mau.exploreai.webrtc.Repository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import com.google.gson.Gson
+import com.mau.exploreai.webrtc.WebRTCClient
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.last
 import java.nio.ByteBuffer
 import org.webrtc.DataChannel
 sealed class ApiResult<out T> {
@@ -70,14 +69,14 @@ class AssistantViewModel(private val repository: Repository) : ViewModel() {
         }
     }
 
-    suspend fun createSession(client: webRTCclient): ApiResult<SessionBody> {
+    suspend fun createSession(client: WebRTCClient): ApiResult<SessionBody> {
         return withContext(Dispatchers.IO) {
             try {
                 // Step 1: Create an offer (sets localDescription internally)
-                client.createOffer(client.pc)
+                val sdp = client.createOffer()
 
                 // Step 2: Start session using the sanitized SDP
-                val result = repository.startSession(client.sanitizedSDP.description)
+                val result = repository.startSession(sdp)
 
                 // Step 3: Handle success or failure
                 result.fold(

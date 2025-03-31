@@ -1,4 +1,4 @@
-package com.example.exploreai.webrtc.models
+package com.mau.exploreai.webrtc.webrtc.models
 
 import com.google.gson.annotations.SerializedName
 

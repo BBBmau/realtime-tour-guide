@@ -9,6 +9,7 @@ android {
     compileSdkVersion 34
     buildFeatures{
         viewBinding true
+        dataBinding true
     }
     defaultConfig {
         minSdkVersion 29
