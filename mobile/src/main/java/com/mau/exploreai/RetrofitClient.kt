@@ -3,15 +3,11 @@ package com.mau.exploreai
 import android.util.Log
 import com.mau.exploreai.assistant.EPHEMERAL_KEY
 import com.mau.exploreai.assistant.ExploreAiAssistantService
-import com.mau.exploreai.assistant.SessionBody
 import okhttp3.Interceptor
-import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
-import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import okhttp3.ResponseBody
 import okhttp3.logging.HttpLoggingInterceptor
