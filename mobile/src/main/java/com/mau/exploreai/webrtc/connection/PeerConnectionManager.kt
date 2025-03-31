@@ -15,11 +15,7 @@ class PeerConnectionManager(private val peerConnectionFactory: PeerConnectionFac
         val rtcConfig = PeerConnection.RTCConfiguration(iceServers)
         
         peerConnection = peerConnectionFactory.createPeerConnection(rtcConfig, createObserver())!!
-        
-        if (peerConnection == null){
-            Log.e("[PEER CONNECTION ERROR]", "Could not create Peer Connection")
-        }
-        
+
         return peerConnection
     }
     
@@ -38,9 +34,8 @@ class PeerConnectionManager(private val peerConnectionFactory: PeerConnectionFac
                 Log.d("[onAudioTrack]", "Received audio track: ${track?.id()}")
             }
             
-            override fun onSignalingChange(signalingState: PeerConnection.SignalingState) {
-                Log.d("WebRTC", "Signaling state change: $signalingState")
-            }
+            override fun onSignalingChange(signalingState: PeerConnection.SignalingState) {Log.d("WebRTC", "Signaling state change: $signalingState")}
+
             
             override fun onIceConnectionChange(iceConnectionState: PeerConnection.IceConnectionState) {
                 Log.d("WebRTC", "ICE connection state change: $iceConnectionState")
@@ -48,7 +43,6 @@ class PeerConnectionManager(private val peerConnectionFactory: PeerConnectionFac
                     PeerConnection.IceConnectionState.CONNECTED -> {
                         Log.d("WebRTC", "ICE Connected!")
                         Log.d("[peerConnection]","connection state: ${peerConnection.connectionState()}")
-                        
                         // Enable speakerphone when connection is established
                         audioManagerCallback?.invoke(true)
                     }
@@ -57,9 +51,7 @@ class PeerConnectionManager(private val peerConnectionFactory: PeerConnectionFac
                 }
             }
 
-            override fun onIceConnectionReceivingChange(p0: Boolean) {
-                TODO("Not yet implemented")
-            }
+            override fun onIceConnectionReceivingChange(p0: Boolean) {}
 
             override fun onIceGatheringChange(iceGatheringState: PeerConnection.IceGatheringState) {
                 Log.d("WebRTC", "ICE gathering state: $iceGatheringState")
@@ -96,9 +88,6 @@ class PeerConnectionManager(private val peerConnectionFactory: PeerConnectionFac
                 Log.d("WebRTC", "Renegotiation needed")
                 // Usually you'd create a new offer here if needed
             }
-
-            // Other observer methods...
-            // ... existing code ...
         }
     }
 } 

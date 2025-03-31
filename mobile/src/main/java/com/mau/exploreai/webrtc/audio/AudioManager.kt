@@ -38,27 +38,4 @@ class AudioManager(context: Context) {
         audioManager.mode = previousMode
         Log.d("WebRTC", "Audio settings restored")
     }
-    
-    /**
-     * Adjust the volume level
-     */
-    fun adjustVolume(increase: Boolean) {
-        val direction = if (increase) 
-            AndroidAudioManager.ADJUST_RAISE 
-        else 
-            AndroidAudioManager.ADJUST_LOWER
-            
-        audioManager.adjustStreamVolume(
-            AndroidAudioManager.STREAM_VOICE_CALL,
-            direction,
-            AndroidAudioManager.FLAG_SHOW_UI
-        )
-    }
-    
-    /**
-     * Get the current volume level
-     */
-    fun getCurrentVolume(): Int {
-        return audioManager.getStreamVolume(AndroidAudioManager.STREAM_VOICE_CALL)
-    }
 } 
