@@ -1,6 +1,7 @@
 package com.mau.exploreai.webrtc
 
 import android.content.Context
+import com.mau.exploreai.assistant.AssistantActivityActivity
 import com.mau.exploreai.webrtc.webrtc.audio.AudioManager
 import com.mau.exploreai.webrtc.webrtc.connection.PeerConnectionManager
 import com.mau.exploreai.webrtc.webrtc.datachannel.DataChannelManager
@@ -11,14 +12,14 @@ import org.webrtc.PeerConnectionFactory
 import org.webrtc.SessionDescription
 
 // Main client that coordinates between components
-class WebRTCClient(ctx: Context) {
+class WebRTCClient(ctx: Context, private val activity: AssistantActivityActivity) {
 
     // Core components
     private val peerConnectionManager: PeerConnectionManager
     private val dataChannelManager: DataChannelManager
     private val sessionDescriptionManager: SessionDescriptionManager
     private val audioManager: AudioManager
-    
+
     // Accessible properties
     val peerConnection: PeerConnection get() = peerConnectionManager.peerConnection
     val dataChannel: DataChannel get() = dataChannelManager.dataChannel
@@ -32,7 +33,6 @@ class WebRTCClient(ctx: Context) {
         val pcFactory = PeerConnectionFactory.builder()
             .setOptions(PeerConnectionFactory.Options())
             .createPeerConnectionFactory()
-            
         audioManager = AudioManager(ctx)
         peerConnectionManager = PeerConnectionManager(pcFactory)
         dataChannelManager = DataChannelManager()
@@ -47,7 +47,7 @@ class WebRTCClient(ctx: Context) {
     // Public API
     fun createPeerConnection() {
         val pc = peerConnectionManager.createPeerConnection()
-        val dc = dataChannelManager.createDataChannel(pc)
+        val dc = dataChannelManager.createDataChannel(pc, activity)
         peerConnectionManager.setupAudioTransceiver()
     }
     

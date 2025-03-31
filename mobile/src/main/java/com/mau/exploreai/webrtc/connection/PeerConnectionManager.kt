@@ -61,32 +61,40 @@ class PeerConnectionManager(private val peerConnectionFactory: PeerConnectionFac
                 TODO("Not yet implemented")
             }
 
-            override fun onIceGatheringChange(p0: PeerConnection.IceGatheringState?) {
-                TODO("Not yet implemented")
+            override fun onIceGatheringChange(iceGatheringState: PeerConnection.IceGatheringState) {
+                Log.d("WebRTC", "ICE gathering state: $iceGatheringState")
+                when (iceGatheringState) {
+                    PeerConnection.IceGatheringState.COMPLETE -> {
+                        // ICE gathering is complete
+                        Log.d("WebRTC", "ICE gathering complete")
+                    }
+                    else -> {
+                        Log.e("WebRTC", "ICE gathering error")
+                    }
+                }
             }
 
-            override fun onIceCandidate(p0: IceCandidate?) {
-                TODO("Not yet implemented")
+            override fun onIceCandidate(iceCandidate: IceCandidate) {
+                // Important: Add the ICE candidate to the peer connection
+                Log.d("WebRTC", "New ICE candidate: ${iceCandidate.sdp}")
+                peerConnection.addIceCandidate(iceCandidate)
             }
 
             override fun onIceCandidatesRemoved(p0: Array<out IceCandidate>?) {
                 TODO("Not yet implemented")
             }
 
-            override fun onAddStream(p0: MediaStream?) {
-                TODO("Not yet implemented")
-            }
-
-            override fun onRemoveStream(p0: MediaStream?) {
-                TODO("Not yet implemented")
-            }
+            // These are deprecated but still required
+            override fun onAddStream(mediaStream: MediaStream) {}
+            override fun onRemoveStream(mediaStream: MediaStream) {}
 
             override fun onDataChannel(p0: DataChannel?) {
                 TODO("Not yet implemented")
             }
 
             override fun onRenegotiationNeeded() {
-                TODO("Not yet implemented")
+                Log.d("WebRTC", "Renegotiation needed")
+                // Usually you'd create a new offer here if needed
             }
 
             // Other observer methods...

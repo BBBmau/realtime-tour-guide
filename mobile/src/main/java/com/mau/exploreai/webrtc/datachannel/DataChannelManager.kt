@@ -1,6 +1,7 @@
 package com.mau.exploreai.webrtc.webrtc.datachannel
 
 import android.util.Log
+import com.mau.exploreai.assistant.AssistantActivityActivity
 import org.json.JSONException
 import org.json.JSONObject
 import org.webrtc.DataChannel
@@ -11,9 +12,10 @@ class DataChannelManager{
     lateinit var dataChannel: DataChannel
     lateinit var messageHandler: MessageHandler
     
-    fun createDataChannel(peerConnection: PeerConnection): DataChannel {
+    fun createDataChannel(peerConnection: PeerConnection, activity: AssistantActivityActivity): DataChannel {
         dataChannel = peerConnection.createDataChannel("oai-events", DataChannel.Init())!!
         dataChannel.registerObserver(createDataChannelObserver())
+        messageHandler = MessageHandler(activity, dataChannel)
         return dataChannel
     }
     

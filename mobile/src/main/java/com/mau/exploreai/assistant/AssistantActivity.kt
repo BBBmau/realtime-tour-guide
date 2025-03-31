@@ -65,7 +65,7 @@ class AssistantActivityActivity : AppCompatActivity() {
             AssistantViewModelFactory((application as AssistantApplication).repository)
         )[AssistantViewModel::class.java]
 
-        webRTCClient = WebRTCClient(this)
+        webRTCClient = WebRTCClient(this, this)
         //TODO: we shouldn't need to call this twice
         LocationTimeUtils.getCurrentDateTimeLocation(this) { _, _, location ->
             loc = location

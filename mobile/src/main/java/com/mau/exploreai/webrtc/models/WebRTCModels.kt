@@ -16,7 +16,6 @@ data class Event(
  */
 data class Session(
     @SerializedName("input_audio_transcription") val input_audio_transcription: InputAudioTranscription? = null,
-    val active: Boolean = true
 )
 
 /**
