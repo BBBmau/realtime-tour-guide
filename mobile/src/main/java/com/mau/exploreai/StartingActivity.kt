@@ -1,4 +1,4 @@
-package com.mau.exploreai.webrtc
+package com.mau.exploreai
 
 import android.app.Application
 import android.content.Intent

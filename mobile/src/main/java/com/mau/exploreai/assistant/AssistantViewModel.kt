@@ -6,9 +6,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.mau.exploreai.webrtc.Conversation
-import com.mau.exploreai.webrtc.ConversationMessage
-import com.mau.exploreai.webrtc.Repository
+import com.mau.exploreai.Conversation
+import com.mau.exploreai.ConversationMessage
+import com.mau.exploreai.Repository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

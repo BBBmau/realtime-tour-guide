@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.mau.exploreai.webrtc.ConversationMessage
+import com.mau.exploreai.ConversationMessage
 import com.mau.exploreai.R
 
 //TODO: we shouldn't need to separate messageAdapters, ideally one should handle both real-time and history messages.

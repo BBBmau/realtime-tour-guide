@@ -19,9 +19,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.mau.exploreai.R
 import com.mau.exploreai.databinding.ActivityAssistantBinding
-import com.mau.exploreai.webrtc.AssistantApplication
-import com.mau.exploreai.webrtc.Conversation
-import com.mau.exploreai.webrtc.ConversationMessage
+import com.mau.exploreai.AssistantApplication
+import com.mau.exploreai.Conversation
+import com.mau.exploreai.ConversationMessage
 import com.mau.exploreai.settings.ToggleSettingsActivity
 import com.mau.exploreai.webrtc.WebRTCClient
 import kotlinx.coroutines.Dispatchers

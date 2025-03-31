@@ -1,4 +1,4 @@
-package com.mau.exploreai.webrtc
+package com.mau.exploreai
 
 import android.util.Log
 import com.mau.exploreai.assistant.EPHEMERAL_KEY

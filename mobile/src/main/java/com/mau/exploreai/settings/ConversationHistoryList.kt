@@ -11,7 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.mau.exploreai.webrtc.Conversation
+import com.mau.exploreai.Conversation
 import com.mau.exploreai.R
 import com.mau.exploreai.assistant.assistant
 import com.google.android.material.appbar.MaterialToolbar

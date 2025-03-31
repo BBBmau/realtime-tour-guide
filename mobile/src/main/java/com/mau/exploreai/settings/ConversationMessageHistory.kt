@@ -6,7 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.mau.exploreai.databinding.ActivityConversationMessagesBinding
-import com.mau.exploreai.webrtc.AssistantApplication
+import com.mau.exploreai.AssistantApplication
 import com.mau.exploreai.assistant.AssistantViewModel
 import com.mau.exploreai.assistant.AssistantViewModelFactory
 import com.mau.exploreai.assistant.ConversationMessageAdapter
