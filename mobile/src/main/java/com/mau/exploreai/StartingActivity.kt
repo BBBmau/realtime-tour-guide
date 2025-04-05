@@ -5,7 +5,6 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.mau.exploreai.assistant.AssistantActivityActivity
-import com.mau.exploreai.utils.NotificationManager
 import com.mau.exploreai.utils.PreferencesManager
 import com.mau.exploreai.utils.TokenManager
 
@@ -13,11 +12,6 @@ import com.mau.exploreai.utils.TokenManager
 class AssistantApplication : Application() {
     // Using by lazy so the database and the repository are only created when they're needed
     // rather than when the application starts
-    val notificationManager = NotificationManager(this)
-
-    init {
-        notificationManager.showNotification("Title", "Hello World")
-    }
 
     val database by lazy { ConversationRoomDatabase.getDatabase(this) }
     val repository by lazy { Repository(database.conversationDAO(), database.messageDAO() ) }

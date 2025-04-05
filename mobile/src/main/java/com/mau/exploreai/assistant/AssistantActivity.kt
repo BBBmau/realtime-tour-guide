@@ -4,6 +4,8 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
@@ -29,6 +31,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.webrtc.SessionDescription
 import com.mau.exploreai.utils.LocationTimeUtils
+import com.mau.exploreai.utils.NotificationManager
 import com.mau.exploreai.utils.PreferencesManager
 
 
@@ -47,6 +50,7 @@ class AssistantActivityActivity : AppCompatActivity() {
     private lateinit var messageAdapter: MessageAdapter
     private lateinit var dest: String
     private lateinit var loc: String
+    private lateinit var notificationManager: NotificationManager
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()

@@ -3,6 +3,8 @@ package com.mau.exploreai.settings
 import android.content.Intent
 import android.graphics.Rect
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -13,12 +15,16 @@ import com.auth0.android.provider.WebAuthProvider
 import com.mau.exploreai.UserInfoActivity
 import com.mau.exploreai.databinding.ActivitySettingsBinding
 import com.mau.exploreai.R
+import com.mau.exploreai.utils.NotificationManager
 import com.mau.exploreai.utils.PreferencesManager
 import com.mau.exploreai.utils.TokenManager
 
 class ToggleSettingsActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySettingsBinding
     private lateinit var account: Auth0
+    private lateinit var notificationManager: NotificationManager
+    private var notificationHandler: Handler? = null
+    private var notificationRunnable: Runnable? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,24 +42,30 @@ class ToggleSettingsActivity : AppCompatActivity() {
 
     private fun setupLissteners() {
         binding.topAppBar.setNavigationOnClickListener { finish() }
-
-        // Get reference to the divider (make sure to add this ID to your XML)
-        val timerDivider = findViewById<View>(R.id.notificationTimerDivider)
-        
-        // Set initial visibility state
-        binding.notificationTimerPickerLayout.visibility = View.GONE
-        timerDivider?.visibility = View.GONE
         
         // Setup keyboard visibility listener
         setupKeyboardVisibilityListener()
         
         binding.notificationSwitch.setOnCheckedChangeListener { _, isChecked ->
-            // Toggle visibility based on switch state
-            binding.notificationTimerPickerLayout.visibility = if (isChecked) View.VISIBLE else View.GONE
-            timerDivider?.visibility = if (isChecked) View.VISIBLE else View.GONE
-            
-            // Also update enabled state
-            binding.notificationTimerPicker.isEnabled = isChecked
+            if (isChecked) {
+                notificationManager = NotificationManager(this)
+                notificationHandler = Handler(Looper.getMainLooper())
+                notificationRunnable = object : Runnable {
+                    override fun run() {
+                        notificationManager.showNotification(
+                            "Delayed Notification",
+                            "This notification appears every ${binding.notificationTimerPicker.value} minutes!"
+                        )
+                        notificationHandler?.postDelayed(this, binding.notificationTimerPicker.value.toLong() * 60000)
+                    }
+                }
+                notificationHandler?.post(notificationRunnable!!)
+            } else {
+                // Remove callbacks when switch is turned off
+                notificationRunnable?.let { notificationHandler?.removeCallbacks(it) }
+                notificationHandler = null
+                notificationRunnable = null
+            }
         }
 
         // Initialize and set up NumberPicker for notification timer
